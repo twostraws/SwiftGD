@@ -1,6 +1,8 @@
 # SwiftGD
 
-This is a simple Swift wrapper for libgd, allowing for basic graphic rendering on server-side Swift where Core Graphics is not available. It wraps GD inside Swift classes to make them easier to use, and provides the following functionality:
+This is a simple Swift wrapper for libgd, allowing for basic graphic rendering on server-side Swift where Core Graphics is not available. Although this package was originally written to accompany my book [Server-Side Swift](https://www.hackingwithswift.com/store/server-side-swift), it's likely to be of general use to anyone wishing to perform image manipulation on their server.
+
+SwiftGD wraps GD inside classes to make it easier to use, and provides the following functionality:
 
 - Loading PNGs and JPEGs from disk.
 - Writing images back to disk as PNG or JPEG.
@@ -43,21 +45,27 @@ These are implemented as classes rather than structs because only classes have d
 
 You can load an image from disk like this:
 
-    let location = URL(fileURLWithPath: "/path/to/image.png")
-    let image = Image(url: location)
+```swift
+let location = URL(fileURLWithPath: "/path/to/image.png")
+let image = Image(url: location)
+```
 
 That will return an optional `Image` object, which will be `nil` if the load failed for some reason. SwiftGD uses the file extension to load the correct file format, so it's important you name your files with "jpg", "jpeg", or "png".
 
 You can also create new images from scratch by providing a width and height, like this:
 
-    let image = Image(width: 500, height: 500)
+```swift
+let image = Image(width: 500, height: 500)
+```
 
 Again, that will return an optional `Image` if the memory was allocated correctly.
 
 When you want to save an image back to disk, use the `write(to:)` method on `Image`, like this:
 
-    let url = URL(fileURLWithPath: "/path/to/save.jpg")
-    image.write(to: url)
+```swift
+let url = URL(fileURLWithPath: "/path/to/save.jpg")
+image.write(to: url)
+```
 
 Again, the format is determined by your choice of file extension. `write(to:)` will return false and refuse to continue if the file exists already; it will return true if the file was saved successfully.
 
@@ -100,82 +108,87 @@ There are several methods that apply filters to image objects:
 
 This first example creates a new 500x500 image, fills it red, draw a blue ellipse in the center, draws a green rectangle on top, runs the desaturate and colorize filters, and saves the resulting image to "output-1.png":
 
-    import Foundation
-    import swiftgd
+```swift
+import Foundation
+import swiftgd
 
-    // figure out where to save our file
-    let currentDirectory = URL(fileURLWithPath: FileManager().currentDirectoryPath)
-    let destination = currentDirectory.appendingPathComponent("output-1.png")
+// figure out where to save our file
+let currentDirectory = URL(fileURLWithPath: FileManager().currentDirectoryPath)
+let destination = currentDirectory.appendingPathComponent("output-1.png")
 
-    // attempt to create a new 500x500 image
-    if let image = Image(width: 500, height: 500) {
-        // flood from from X:250 Y:250 using red
-        image.fill(from: Point(x: 250, y: 250), color: Color.red)
+// attempt to create a new 500x500 image
+if let image = Image(width: 500, height: 500) {
+    // flood from from X:250 Y:250 using red
+    image.fill(from: Point(x: 250, y: 250), color: Color.red)
 
-        // draw a filled blue ellipse in the center
-        image.fillEllipse(center: Point(x: 250, y: 250), size: Size(width: 150, height: 150), color: Color.blue)
+    // draw a filled blue ellipse in the center
+    image.fillEllipse(center: Point(x: 250, y: 250), size: Size(width: 150, height: 150), color: Color.blue)
         
-        // draw a filled green rectangle also in the center
-        image.fillRectangle(topLeft: Point(x: 200, y: 200), bottomRight: Point(x: 300, y: 300), color: Color.green)
+    // draw a filled green rectangle also in the center
+    image.fillRectangle(topLeft: Point(x: 200, y: 200), bottomRight: Point(x: 300, y: 300), color: Color.green)
 
-        // remove all the colors from the image
-        image.desaturate()
+    // remove all the colors from the image
+    image.desaturate()
         
-        // now apply a dark red tint
-        image.colorize(using: Color(red: 0.3, green: 0, blue: 0, alpha: 1))
+    // now apply a dark red tint
+    image.colorize(using: Color(red: 0.3, green: 0, blue: 0, alpha: 1))
         
-        // save the final image to disk
-        image.write(to: destination)
-    }
+    // save the final image to disk
+    image.write(to: destination)
+}
+```
 
 This second examples draws concentric rectangles in alternating blue and white colors, then applies a Gaussian blur to the result:
 
-    import Foundation
-    import swiftgd
+```swift
+import Foundation
+import swiftgd
 
-    let currentDirectory = URL(fileURLWithPath: FileManager().currentDirectoryPath)
-    let destination = currentDirectory.appendingPathComponent("output-2.png")
+let currentDirectory = URL(fileURLWithPath: FileManager().currentDirectoryPath)
+let destination = currentDirectory.appendingPathComponent("output-2.png")
 
-    if let image = Image(width: 500, height: 500) {
-        var counter = 0
+if let image = Image(width: 500, height: 500) {
+    var counter = 0
         
-        for i in stride(from: 0, to: 250, by: 10) {
-            let drawColor: Color
-            
-            if counter % 2 == 0 {
-                drawColor = .blue
-            } else {
-                drawColor = .white
-            }
-            
-            image.fillRectangle(topLeft: Point(x: i, y: i), bottomRight: Point(x: 500 - i, y: 500 - i), color: drawColor)
-            counter += 1
+    for i in stride(from: 0, to: 250, by: 10) {
+        let drawColor: Color
+        
+        if counter % 2 == 0 {
+            drawColor = .blue
+        } else {
+            drawColor = .white
         }
-
-        image.blur(radius: 10)
-        image.write(to: destination)
+        
+        image.fillRectangle(topLeft: Point(x: i, y: i), bottomRight: Point(x: 500 - i, y: 500 - i), color: drawColor)
+        counter += 1
     }
+
+    image.blur(radius: 10)
+    image.write(to: destination)
+}
+```
 
 This third example creates a black, red, green, and yellow gradient by setting individual pixels in a nested loop:
 
-    import Foundation
-    import swiftgd
+```swift
+import Foundation
+import swiftgd
 
-    let currentDirectory = URL(fileURLWithPath: FileManager().currentDirectoryPath)
-    let destination = currentDirectory.appendingPathComponent("output-3.png")
+let currentDirectory = URL(fileURLWithPath: FileManager().currentDirectoryPath)
+let destination = currentDirectory.appendingPathComponent("output-3.png")
 
-    let size = 500
+let size = 500
 
-    if let image = Image(width: size, height: size) {
-        for x in 0 ... size {
-            for y in 0 ... size {
-                image.set(pixel: Point(x: x, y: y), to: Color(red: Double(x) / Double(size), green: Double(y) / Double(size), blue: 0, alpha: 1))
-            }
+if let image = Image(width: size, height: size) {
+    for x in 0 ... size {
+        for y in 0 ... size {
+            image.set(pixel: Point(x: x, y: y), to: Color(red: Double(x) / Double(size), green: Double(y) / Double(size), blue: 0, alpha: 1))
         }
-        
-        image.write(to: destination)
     }
-
+        
+    image.write(to: destination)
+}
+```
 
 ## License
 
