@@ -34,9 +34,9 @@ public class Image {
 
 		let loadedImage: gdImagePtr?
 
-		if url.lastPathComponent.hasSuffix("jpg") || url.lastPathComponent.hasSuffix("jpeg") {
+		if url.lastPathComponent.lowercased().hasSuffix("jpg") || url.lastPathComponent.lowercased().hasSuffix("jpeg") {
 			loadedImage = gdImageCreateFromJpeg(inputFile)
-		} else if url.lastPathComponent.hasSuffix("png") {
+		} else if url.lastPathComponent.lowercased().hasSuffix("png") {
 			loadedImage = gdImageCreateFromPng(inputFile)
 		} else {
 			return nil
@@ -55,7 +55,7 @@ public class Image {
 
 	@discardableResult
 	public func write(to url: URL, quality: Int = 100) -> Bool {
-		let fileType = url.pathExtension
+		let fileType = url.pathExtension.lowercased()
 		guard fileType == "png" || fileType == "jpeg" || fileType == "jpg" else { return false }
 
 		let fm = FileManager()
