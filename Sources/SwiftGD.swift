@@ -18,8 +18,8 @@ public class Image {
 
 	private var internalImage: gdImagePtr
 
-	public var size: (width: Int, height: Int) {
-		return (width: Int(internalImage.pointee.sx), height: Int(internalImage.pointee.sy))
+	public var size: Size {
+		return Size(width: internalImage.pointee.sx, height: internalImage.pointee.sy)
 	}
 
 	public init?(width: Int, height: Int) {
@@ -87,44 +87,47 @@ public class Image {
 	}
 
 	public func resizedTo(width: Int, height: Int, applySmoothing: Bool = true) -> Image? {
-		if applySmoothing {
-			gdImageSetInterpolationMethod(internalImage, GD_BILINEAR_FIXED)
-		} else {
-			gdImageSetInterpolationMethod(internalImage, GD_NEAREST_NEIGHBOUR)
-		}
+		applyInterpolation(enabled: applySmoothing, currentSize: size, newSize: Size(width: width, height: height))
 
 		guard let output = gdImageScale(internalImage, UInt32(width), UInt32(height)) else { return nil }
 		return Image(gdImage: output)
 	}
 
 	public func resizedTo(width: Int, applySmoothing: Bool = true) -> Image? {
-		if applySmoothing {
-			gdImageSetInterpolationMethod(internalImage, GD_BILINEAR_FIXED)
-		} else {
-			gdImageSetInterpolationMethod(internalImage, GD_NEAREST_NEIGHBOUR)
-		}
-
 		let currentSize = size
 		let heightAdjustment = Double(width) / Double(currentSize.width)
-		let newHeight = Double(currentSize.height) * Double(heightAdjustment)
+		let newSize = Size(width: Int32(width), height: Int32(Double(currentSize.height) * Double(heightAdjustment)))
 
-		guard let output = gdImageScale(internalImage, UInt32(width), UInt32(newHeight)) else { return nil }
+		applyInterpolation(enabled: applySmoothing, currentSize: currentSize, newSize: newSize)
+
+		guard let output = gdImageScale(internalImage, UInt32(newSize.width), UInt32(newSize.height)) else { return nil }
 		return Image(gdImage: output)
 	}
 
 	public func resizedTo(height: Int, applySmoothing: Bool = true) -> Image? {
-		if applySmoothing {
-			gdImageSetInterpolationMethod(internalImage, GD_BILINEAR_FIXED)
+		let currentSize = size
+		let widthAdjustment = Double(height) / Double(currentSize.height)
+		let newSize = Size(width: Int32(Double(currentSize.width) * Double(widthAdjustment)), height: Int32(height))
+
+		applyInterpolation(enabled: applySmoothing, currentSize: currentSize, newSize: newSize)
+
+		guard let output = gdImageScale(internalImage, UInt32(newSize.width), UInt32(height)) else { return nil }
+		return Image(gdImage: output)
+	}
+
+	public func applyInterpolation(enabled: Bool, currentSize: Size, newSize: Size) {
+		guard enabled else {
+			gdImageSetInterpolationMethod(internalImage, GD_NEAREST_NEIGHBOUR)
+			return
+		}
+
+		if currentSize > newSize {
+			gdImageSetInterpolationMethod(internalImage, GD_SINC)
+		} else if currentSize < newSize {
+			gdImageSetInterpolationMethod(internalImage, GD_MITCHELL)
 		} else {
 			gdImageSetInterpolationMethod(internalImage, GD_NEAREST_NEIGHBOUR)
 		}
-
-		let currentSize = size
-		let widthAdjustment = Double(height) / Double(currentSize.height)
-		let newWidth = Double(currentSize.width) * Double(widthAdjustment)
-
-		guard let output = gdImageScale(internalImage, UInt32(newWidth), UInt32(height)) else { return nil }
-		return Image(gdImage: output)
 	}
 
 	public func fill(from: Point, color: Color) {
@@ -234,14 +237,27 @@ public struct Point {
 	}
 }
 
-public struct Size {
-	var width: Int
-	var height: Int
+public struct Size: Comparable {
+	public var width: Int
+	public var height: Int
 
 	public init(width: Int, height: Int) {
 		self.width = width
 		self.height = height
 	}
+
+	public init(width: Int32, height: Int32) {
+		self.width = Int(width)
+		self.height = Int(height)
+	}
+}
+
+public func <(lhs: Size, rhs: Size) -> Bool {
+	return lhs.width < rhs.width && lhs.height < rhs.height
+}
+
+public func ==(lhs: Size, rhs: Size) -> Bool {
+	return lhs.width == rhs.width && lhs.height == rhs.height
 }
 
 public class Color {
