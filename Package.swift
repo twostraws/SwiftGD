@@ -1,8 +1,20 @@
+// swift-tools-version:4.0
 import PackageDescription
 
 let package = Package(
     name: "SwiftGD",
+    products: [
+        .library(
+            name: "SwiftGD",
+            targets: ["SwiftGD"]
+        )
+    ],
     dependencies: [
-        .Package(url: "https://github.com/twostraws/Cgd.git", majorVersion: 0, minor: 1)
+        .package(url: "https://github.com/twostraws/Cgd.git", .upToNextMinor(from: "0.2.0"))
+    ],
+    targets: [
+        .target(
+            name: "SwiftGD"
+        )
     ]
 )
