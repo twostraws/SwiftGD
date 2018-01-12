@@ -49,6 +49,26 @@ public class Image {
 		}
 	}
 
+    public convenience init?(data: Data) {
+
+        // Bytes must not exceed int32 as limit by `gdImageCreate..()`
+        guard data.count < Int32.max else { return nil }
+
+        // Creates a gdImage pointer if given data represents an image in either PNG or JPEG raster format
+        let createImage: (UnsafeMutablePointer<UInt8>) -> gdImagePtr? = { pointer in
+            let size = Int32(data.count)
+            let rawPointer = UnsafeMutableRawPointer(pointer)
+            return gdImageCreateFromPngPtr(size, rawPointer) // Returns if valid PNG image data
+                ?? gdImageCreateFromJpegPtr(size, rawPointer) // Returns if valid JPEG image data
+                ?? gdImageCreateFromWebpPtr(size, rawPointer) // Returns if valid WEBP image data
+                ?? nil
+        }
+
+        var imageData = data
+        guard let gdImage = imageData.withUnsafeMutableBytes(createImage) else { return nil }
+        self.init(gdImage: gdImage)
+    }
+
 	private init(gdImage: gdImagePtr) {
 		self.internalImage = gdImage
 	}
