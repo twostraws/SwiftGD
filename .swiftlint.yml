@@ -1,0 +1,3 @@
+line_length: 140
+disabled_rules:
+  - identifier_name # Due to a lot of r,g,b and x,y properties

@@ -94,18 +94,14 @@ public class Image {
 		defer { fclose(outputFile) }
 
 		// write the correct output format based on the path extension
-
-
-		switch fileType {
-			case "png":
-				gdImageSaveAlpha(internalImage, 1)
-				gdImagePng(internalImage, outputFile)
-			case "jpg":
-				fallthrough
-			case "jpeg":
-				gdImageJpeg(internalImage, outputFile, Int32(quality))
-			default:
-				return false
+        switch fileType {
+        case "png":
+            gdImageSaveAlpha(internalImage, 1)
+            gdImagePng(internalImage, outputFile)
+        case "jpg", "jpeg":
+            gdImageJpeg(internalImage, outputFile, Int32(quality))
+        default:
+            return false
 		}
 
 		// return true or false based on whether the output file now exists
@@ -157,21 +153,33 @@ public class Image {
 	}
 
 	public func fill(from: Point, color: Color) {
-		let internalColor = gdImageColorAllocateAlpha(internalImage, Int32(color.redComponent * 255.0), Int32(color.greenComponent * 255.0), Int32(color.blueComponent * 255.0), 127 - Int32(color.alphaComponent * 127.0))
+        let red = Int32(color.redComponent * 255.0)
+        let green = Int32(color.greenComponent * 255.0)
+        let blue = Int32(color.blueComponent * 255.0)
+        let alpha = 127 - Int32(color.alphaComponent * 127.0)
+		let internalColor = gdImageColorAllocateAlpha(internalImage, red, green, blue, alpha)
 		defer { gdImageColorDeallocate(internalImage, internalColor) }
 
 		gdImageFill(internalImage, Int32(from.x), Int32(from.y), internalColor)
 	}
 
 	public func drawLine(from: Point, to: Point, color: Color) {
-		let internalColor = gdImageColorAllocateAlpha(internalImage, Int32(color.redComponent * 255.0), Int32(color.greenComponent * 255.0), Int32(color.blueComponent * 255.0), 127 - Int32(color.alphaComponent * 127.0))
+        let red = Int32(color.redComponent * 255.0)
+        let green = Int32(color.greenComponent * 255.0)
+        let blue = Int32(color.blueComponent * 255.0)
+        let alpha = 127 - Int32(color.alphaComponent * 127.0)
+        let internalColor = gdImageColorAllocateAlpha(internalImage, red, green, blue, alpha)
 		defer { gdImageColorDeallocate(internalImage, internalColor) }
 
 		gdImageLine(internalImage, Int32(from.x), Int32(from.y), Int32(to.x), Int32(to.y), internalColor)
 	}
 
 	public func set(pixel: Point, to color: Color) {
-		let internalColor = gdImageColorAllocateAlpha(internalImage, Int32(color.redComponent * 255.0), Int32(color.greenComponent * 255.0), Int32(color.blueComponent * 255.0), 127 - Int32(color.alphaComponent * 127.0))
+        let red = Int32(color.redComponent * 255.0)
+        let green = Int32(color.greenComponent * 255.0)
+        let blue = Int32(color.blueComponent * 255.0)
+        let alpha = 127 - Int32(color.alphaComponent * 127.0)
+        let internalColor = gdImageColorAllocateAlpha(internalImage, red, green, blue, alpha)
 		defer { gdImageColorDeallocate(internalImage, internalColor) }
 
 		gdImageSetPixel(internalImage, Int32(pixel.x), Int32(pixel.y), internalColor)
@@ -183,28 +191,44 @@ public class Image {
 	}
 
 	public func strokeEllipse(center: Point, size: Size, color: Color) {
-		let internalColor = gdImageColorAllocateAlpha(internalImage, Int32(color.redComponent * 255.0), Int32(color.greenComponent * 255.0), Int32(color.blueComponent * 255.0), 127 - Int32(color.alphaComponent * 127.0))
+        let red = Int32(color.redComponent * 255.0)
+        let green = Int32(color.greenComponent * 255.0)
+        let blue = Int32(color.blueComponent * 255.0)
+        let alpha = 127 - Int32(color.alphaComponent * 127.0)
+        let internalColor = gdImageColorAllocateAlpha(internalImage, red, green, blue, alpha)
 		defer { gdImageColorDeallocate(internalImage, internalColor) }
 
 		gdImageEllipse(internalImage, Int32(center.x), Int32(center.y), Int32(size.width), Int32(size.height), internalColor)
 	}
 
 	public func fillEllipse(center: Point, size: Size, color: Color) {
-		let internalColor = gdImageColorAllocateAlpha(internalImage, Int32(color.redComponent * 255.0), Int32(color.greenComponent * 255.0), Int32(color.blueComponent * 255.0), 127 - Int32(color.alphaComponent * 127.0))
+        let red = Int32(color.redComponent * 255.0)
+        let green = Int32(color.greenComponent * 255.0)
+        let blue = Int32(color.blueComponent * 255.0)
+        let alpha = 127 - Int32(color.alphaComponent * 127.0)
+        let internalColor = gdImageColorAllocateAlpha(internalImage, red, green, blue, alpha)
 		defer { gdImageColorDeallocate(internalImage, internalColor) }
 
 		gdImageFilledEllipse(internalImage, Int32(center.x), Int32(center.y), Int32(size.width), Int32(size.height), internalColor)
 	}
 
 	public func strokeRectangle(topLeft: Point, bottomRight: Point, color: Color) {
-		let internalColor = gdImageColorAllocateAlpha(internalImage, Int32(color.redComponent * 255.0), Int32(color.greenComponent * 255.0), Int32(color.blueComponent * 255.0), 127 - Int32(color.alphaComponent * 127.0))
+        let red = Int32(color.redComponent * 255.0)
+        let green = Int32(color.greenComponent * 255.0)
+        let blue = Int32(color.blueComponent * 255.0)
+        let alpha = 127 - Int32(color.alphaComponent * 127.0)
+        let internalColor = gdImageColorAllocateAlpha(internalImage, red, green, blue, alpha)
 		defer { gdImageColorDeallocate(internalImage, internalColor) }
 
 		gdImageRectangle(internalImage, Int32(topLeft.x), Int32(topLeft.y), Int32(bottomRight.x), Int32(bottomRight.y), internalColor)
 	}
 
 	public func fillRectangle(topLeft: Point, bottomRight: Point, color: Color) {
-		let internalColor = gdImageColorAllocateAlpha(internalImage, Int32(color.redComponent * 255.0), Int32(color.greenComponent * 255.0), Int32(color.blueComponent * 255.0), 127 - Int32(color.alphaComponent * 127.0))
+        let red = Int32(color.redComponent * 255.0)
+        let green = Int32(color.greenComponent * 255.0)
+        let blue = Int32(color.blueComponent * 255.0)
+        let alpha = 127 - Int32(color.alphaComponent * 127.0)
+        let internalColor = gdImageColorAllocateAlpha(internalImage, red, green, blue, alpha)
 		defer { gdImageColorDeallocate(internalImage, internalColor) }
 
 		gdImageFilledRectangle(internalImage, Int32(topLeft.x), Int32(topLeft.y), Int32(bottomRight.x), Int32(bottomRight.y), internalColor)
@@ -233,7 +257,11 @@ public class Image {
 	}
 
 	public func colorize(using color: Color) {
-		gdImageColor(internalImage, Int32(color.redComponent * 255), Int32(color.greenComponent * 255), Int32(color.blueComponent * 255), 127 - Int32(color.alphaComponent * 127.0))
+        let red = Int32(color.redComponent * 255.0)
+        let green = Int32(color.greenComponent * 255.0)
+        let blue = Int32(color.blueComponent * 255.0)
+        let alpha = 127 - Int32(color.alphaComponent * 127.0)
+		gdImageColor(internalImage, red, green, blue, alpha)
 	}
 
 	public func desaturate() {
@@ -246,7 +274,6 @@ public class Image {
 	}
 }
 
-
 public struct Point: Equatable {
 	public var x: Int
 	public var y: Int
@@ -256,7 +283,7 @@ public struct Point: Equatable {
 		self.y = y
 	}
 
-    public static func ==(lhs: Point, rhs: Point) -> Bool {
+    public static func == (lhs: Point, rhs: Point) -> Bool {
         return lhs.x == rhs.x && lhs.y == rhs.y
     }
 }
@@ -276,11 +303,11 @@ public struct Size: Comparable {
 		self.height = Int(height)
 	}
 
-    public static func <(lhs: Size, rhs: Size) -> Bool {
+    public static func < (lhs: Size, rhs: Size) -> Bool {
         return (lhs.width * lhs.height) < (rhs.width * rhs.height)
     }
 
-    public static func ==(lhs: Size, rhs: Size) -> Bool {
+    public static func == (lhs: Size, rhs: Size) -> Bool {
         return lhs.width == rhs.width && lhs.height == rhs.height
     }
 }

@@ -1,6 +1,6 @@
 import XCTest
-@testable import swiftgdTests
+@testable import SwiftGDTests
 
 XCTMain([
-     testCase(swiftgdTests.allTests),
+     testCase(SwiftGDTests.allTests)
 ])
