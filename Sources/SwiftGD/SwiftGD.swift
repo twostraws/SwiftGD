@@ -187,7 +187,12 @@ public class Image {
 
 	public func get(pixel: Point) -> Color {
 		let color = gdImageGetTrueColorPixel(internalImage, Int32(pixel.x), Int32(pixel.y))
-        return Color(hex: Int(color), leadingAlpha: true)
+        let a = Double((color >> 24) & 0xFF)
+        let r = Double((color >> 16) & 0xFF)
+        let g = Double((color >> 8) & 0xFF)
+        let b = Double(color & 0xFF)
+
+        return Color(red: r / 255, green: g / 255, blue: b / 255, alpha: 1 - (a / 127))
 	}
 
 	public func strokeEllipse(center: Point, size: Size, color: Color) {
@@ -304,7 +309,7 @@ public struct Size: Comparable {
 	}
 
     public static func < (lhs: Size, rhs: Size) -> Bool {
-        return (lhs.width * lhs.height) < (rhs.width * rhs.height)
+        return lhs.width < rhs.width && lhs.height < rhs.height
     }
 
     public static func == (lhs: Size, rhs: Size) -> Bool {
@@ -396,7 +401,9 @@ extension Color {
 
     /// Sanitizes given hexadecimal color string (strips # and forms proper length).
     ///
-    /// - Parameter string: The hexadecimal color string to sanitize
+    /// - Parameters:
+    ///   - string: The hexadecimal color string to sanitize
+    ///   - leadingAlpha: Indicate whether given and returning string should be treated as ARGB (`true`) or RGBA (`false`)
     /// - Returns: The sanitized hexadecimal color string
     /// - Throws: `.invalidColor` if given string is not of proper length
     private static func sanitize(hex string: String, leadingAlpha: Bool) throws -> String {
