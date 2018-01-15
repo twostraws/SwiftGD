@@ -247,7 +247,7 @@ public class Image {
 }
 
 
-public struct Point {
+public struct Point: Equatable {
 	public var x: Int
 	public var y: Int
 
@@ -255,9 +255,14 @@ public struct Point {
 		self.x = x
 		self.y = y
 	}
+
+    public static func ==(lhs: Point, rhs: Point) -> Bool {
+        return lhs.x == rhs.x && lhs.y == rhs.y
+    }
 }
 
 public struct Size: Comparable {
+
 	public var width: Int
 	public var height: Int
 
@@ -270,14 +275,14 @@ public struct Size: Comparable {
 		self.width = Int(width)
 		self.height = Int(height)
 	}
-}
 
-public func <(lhs: Size, rhs: Size) -> Bool {
-	return lhs.width < rhs.width && lhs.height < rhs.height
-}
+    public static func <(lhs: Size, rhs: Size) -> Bool {
+        return (lhs.width * lhs.height) < (rhs.width * rhs.height)
+    }
 
-public func ==(lhs: Size, rhs: Size) -> Bool {
-	return lhs.width == rhs.width && lhs.height == rhs.height
+    public static func ==(lhs: Size, rhs: Size) -> Bool {
+        return lhs.width == rhs.width && lhs.height == rhs.height
+    }
 }
 
 // MARK: - Color
