@@ -64,10 +64,26 @@ public class Image {
         let createImage: (UnsafeMutablePointer<UInt8>) -> gdImagePtr? = { pointer in
             let size = Int32(data.count)
             let rawPointer = UnsafeMutableRawPointer(pointer)
-            return gdImageCreateFromPngPtr(size, rawPointer) // Returns if valid PNG image data
-                ?? gdImageCreateFromJpegPtr(size, rawPointer) // Returns if valid JPEG image data
-                ?? gdImageCreateFromWebpPtr(size, rawPointer) // Returns if valid WEBP image data
-                ?? nil
+
+            if let image = gdImageCreateFromPngPtr(size, rawPointer) {
+                return image
+            } else if let image = gdImageCreateFromJpegPtr(size, rawPointer) {
+                return image
+            } else if let image = gdImageCreateFromWebpPtr(size, rawPointer) {
+                return image
+            } else if let image = gdImageCreateFromGifPtr(size, rawPointer) {
+                return image
+            } else if let image = gdImageCreateFromWBMPPtr(size, rawPointer) {
+                return image
+            } else if let image = gdImageCreateFromTiffPtr(size, rawPointer) {
+                return image
+            } else if let image = gdImageCreateFromTgaPtr(size, rawPointer) {
+                return image
+            } else if let image = gdImageCreateFromBmpPtr(size, rawPointer) {
+                return image
+            } else {
+                return nil
+            }
         }
 
         var imageData = data
