@@ -60,7 +60,7 @@ public class Image {
         // Bytes must not exceed int32 as limit by `gdImageCreate..()`
         guard data.count < Int32.max else { return nil }
 
-        // Creates a gdImage pointer if given data represents an image in either PNG or JPEG raster format
+        // Creates a gdImage pointer if given data represents an image in of the supported raster formats
         let createImage: (UnsafeMutablePointer<UInt8>) -> gdImagePtr? = { pointer in
             let size = Int32(data.count)
             let rawPointer = UnsafeMutableRawPointer(pointer)
@@ -347,10 +347,10 @@ extension Color {
     /// The maximum representable integer for each color component.
     private static let maxHex: Int = 0xff
 
-    /// Initializes a new `Color` instance of given hexadecimal color string.
+    /// Initializes a new `Color` instance from a given hexadecimal color string.
     ///
     /// Given string will be stripped from a single leading "#", if applicable.
-    /// Resulting string must met any of the following criteria:
+    /// Resulting string must meet any of the following criteria:
     ///
     /// - Is a string with 8-characters and therefore a fully fledged hexadecimal
     ///   color representation **including** an alpha component. Given value will remain
@@ -379,7 +379,7 @@ extension Color {
         self.init(hex: code, leadingAlpha: leadingAlpha)
     }
 
-    /// Initializes a new `Color` instance of given hexadecimal color values.
+    /// Initializes a new `Color` instance from a given hexadecimal color values.
     ///
     /// - Parameters:
     ///   - color: The hexadecimal color value, incl. red, green, blue and alpha
@@ -387,13 +387,13 @@ extension Color {
     public convenience init(hex color: Int, leadingAlpha: Bool = false) {
         let max = Double(Color.maxHex)
         let first = Double((color >> 24) & Color.maxHex) / max
-        let secnd = Double((color >> 16) & Color.maxHex) / max
+        let second = Double((color >> 16) & Color.maxHex) / max
         let third = Double((color >>  8) & Color.maxHex) / max
-        let forth = Double((color >>  0) & Color.maxHex) / max
+        let fourth = Double((color >>  0) & Color.maxHex) / max
         if leadingAlpha {
-            self.init(red: secnd, green: third, blue: forth, alpha: first) // ARGB
+            self.init(red: second, green: third, blue: fourth, alpha: first) // ARGB
         } else {
-            self.init(red: first, green: secnd, blue: third, alpha: forth) // RGBA
+            self.init(red: first, green: second, blue: third, alpha: fourth) // RGBA
         }
     }
 
@@ -416,7 +416,7 @@ extension Color {
             string = string.map({ "\($0)\($0)" }).joined()
         }
 
-        // Evaluate if fully fledged code w/wo alpha (e.g. `ffaabb` or `ffaabb44`), otherwise throw error
+        // Evaluate if this is a fully fledged code with or without alpha (e.g. `ffaabb` or `ffaabb44`), otherwise throw error
         switch string.count {
         case 6: // Hex color code without alpha (e.g. ffeeaa)
             let alpha = String(Color.maxHex, radix: 16) // 0xff (opaque)
