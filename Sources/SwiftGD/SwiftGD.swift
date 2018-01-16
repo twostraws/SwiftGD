@@ -10,9 +10,12 @@ import Foundation
 
 /// Represents errors that can be thrown within the SwiftGD module.
 ///
+/// - invalidImage: Contains the reason this error was thrown.
 /// - invalidColor: Contains the reason this error was thrown.
 public enum Error: Swift.Error {
-    case invalidColor(reason: String) /// The reason this error was thrown.
+    case invalidRasterFormat
+    case invalidImage(reason: String) // The reason this error was thrown
+    case invalidColor(reason: String) // The reason this error was thrown.
 }
 
 // In case you were wondering: it's a class rather than a struct because we need
@@ -32,96 +35,8 @@ public class Image {
 		internalImage = gdImageCreateTrueColor(Int32(width), Int32(height))
 	}
 
-	public init?(url: URL) {
-		let inputFile = fopen(url.path, "rb")
-		defer { fclose(inputFile) }
-
-		guard inputFile != nil else { return nil }
-
-		let loadedImage: gdImagePtr?
-
-		if url.lastPathComponent.lowercased().hasSuffix("jpg") || url.lastPathComponent.lowercased().hasSuffix("jpeg") {
-			loadedImage = gdImageCreateFromJpeg(inputFile)
-		} else if url.lastPathComponent.lowercased().hasSuffix("png") {
-			loadedImage = gdImageCreateFromPng(inputFile)
-		} else {
-			return nil
-		}
-
-		if let image = loadedImage {
-			internalImage = image
-		} else {
-			return nil
-		}
-	}
-
-    public convenience init?(data: Data) {
-
-        // Bytes must not exceed int32 as limit by `gdImageCreate..()`
-        guard data.count < Int32.max else { return nil }
-
-        // Creates a gdImage pointer if given data represents an image in of the supported raster formats
-        let createImage: (UnsafeMutablePointer<UInt8>) -> gdImagePtr? = { pointer in
-            let size = Int32(data.count)
-            let rawPointer = UnsafeMutableRawPointer(pointer)
-
-            if let image = gdImageCreateFromPngPtr(size, rawPointer) {
-                return image
-            } else if let image = gdImageCreateFromJpegPtr(size, rawPointer) {
-                return image
-            } else if let image = gdImageCreateFromWebpPtr(size, rawPointer) {
-                return image
-            } else if let image = gdImageCreateFromGifPtr(size, rawPointer) {
-                return image
-            } else if let image = gdImageCreateFromWBMPPtr(size, rawPointer) {
-                return image
-            } else if let image = gdImageCreateFromTiffPtr(size, rawPointer) {
-                return image
-            } else if let image = gdImageCreateFromTgaPtr(size, rawPointer) {
-                return image
-            } else if let image = gdImageCreateFromBmpPtr(size, rawPointer) {
-                return image
-            } else {
-                return nil
-            }
-        }
-
-        var imageData = data
-        guard let gdImage = imageData.withUnsafeMutableBytes(createImage) else { return nil }
-        self.init(gdImage: gdImage)
-    }
-
 	private init(gdImage: gdImagePtr) {
 		self.internalImage = gdImage
-	}
-
-	@discardableResult
-	public func write(to url: URL, quality: Int = 100) -> Bool {
-		let fileType = url.pathExtension.lowercased()
-		guard fileType == "png" || fileType == "jpeg" || fileType == "jpg" else { return false }
-
-		let fm = FileManager()
-
-		// refuse to overwrite existing files
-		guard fm.fileExists(atPath: url.path) == false else { return false }
-
-		// open our output file, then defer it to close
-		let outputFile = fopen(url.path, "wb")
-		defer { fclose(outputFile) }
-
-		// write the correct output format based on the path extension
-        switch fileType {
-        case "png":
-            gdImageSaveAlpha(internalImage, 1)
-            gdImagePng(internalImage, outputFile)
-        case "jpg", "jpeg":
-            gdImageJpeg(internalImage, outputFile, Int32(quality))
-        default:
-            return false
-		}
-
-		// return true or false based on whether the output file now exists
-		return fm.fileExists(atPath: url.path)
 	}
 
 	public func resizedTo(width: Int, height: Int, applySmoothing: Bool = true) -> Image? {
@@ -293,6 +208,100 @@ public class Image {
 		// always destroy our internal image resource
 		gdImageDestroy(internalImage)
 	}
+}
+
+// MARK: Import & Export
+
+extension Image {
+
+    public convenience init?(url: URL) {
+        let inputFile = fopen(url.path, "rb")
+        defer { fclose(inputFile) }
+
+        guard inputFile != nil else { return nil }
+
+        let loadedImage: gdImagePtr?
+
+        if url.lastPathComponent.lowercased().hasSuffix("jpg") || url.lastPathComponent.lowercased().hasSuffix("jpeg") {
+            loadedImage = gdImageCreateFromJpeg(inputFile)
+        } else if url.lastPathComponent.lowercased().hasSuffix("png") {
+            loadedImage = gdImageCreateFromPng(inputFile)
+        } else {
+            return nil
+        }
+
+        guard let image = loadedImage else { return nil }
+        self.init(gdImage: image)
+    }
+
+    @discardableResult
+    public func write(to url: URL, quality: Int = 100) -> Bool {
+        let fileType = url.pathExtension.lowercased()
+        guard fileType == "png" || fileType == "jpeg" || fileType == "jpg" else { return false }
+
+        let fm = FileManager()
+
+        // refuse to overwrite existing files
+        guard fm.fileExists(atPath: url.path) == false else { return false }
+
+        // open our output file, then defer it to close
+        let outputFile = fopen(url.path, "wb")
+        defer { fclose(outputFile) }
+
+        // write the correct output format based on the path extension
+        switch fileType {
+        case "png":
+            gdImageSaveAlpha(internalImage, 1)
+            gdImagePng(internalImage, outputFile)
+        case "jpg", "jpeg":
+            gdImageJpeg(internalImage, outputFile, Int32(quality))
+        default:
+            return false
+        }
+
+        // return true or false based on whether the output file now exists
+        return fm.fileExists(atPath: url.path)
+    }
+
+    /// Initializes a new `Image` instance from given image data in specified raster format.
+    /// If `ImageRasterFormat` is omitted, all supported raster formats will be evaluated.
+    ///
+    /// - Parameters:
+    ///   - data: The image data
+    ///   - rasterFormatter: An `ImportableRasterFormatter` instance that manages import conversion
+    /// - Throws: `Error` if `data` in `rasterFormat` could not be converted
+    public convenience init(data: Data, using rasterFormatter: ImportableRasterFormatter) throws {
+        try self.init(gdImage: rasterFormatter.imagePtr(of: data))
+    }
+
+    /// Initializes a new `Image` instance from given image data in specified raster format.
+    /// If `DefaultImportableRasterFormat` is omitted, all supported raster formats will be evaluated.
+    ///
+    /// - Parameters:
+    ///   - data: The image data
+    ///   - rasterFormat: The raster format of image data (e.g. png, webp, ...). Defaults to `.any`
+    /// - Throws: `Error` if `data` in `rasterFormat` could not be converted
+    public convenience init(data: Data, as rasterFormat: ImportableRasterFormat = .any) throws {
+        try self.init(data: data, using: rasterFormat)
+    }
+
+    /// Exports the image as `Data` object in specified raster format.
+    ///
+    /// - Parameter rasterFormatter: An `ExportableRasterFormatter` instance that manages export conversion
+    /// - Returns: The image data
+    /// - Throws: `Error` if the export of `self` in specified raster format failed.
+    public func export(using rasterFormatter: ExportableRasterFormatter) throws -> Data {
+        return try rasterFormatter.data(of: internalImage)
+    }
+
+    /// Exports the image as `Data` object in specified raster format.
+    ///
+    /// - Parameter rasterFormat: The raster format of the returning image data (e.g. as jpg, png, ...). Defaults to `.png`
+    /// - Returns: The image data
+    /// - Throws: `Error` if the export of `self` in specified raster format failed.
+    public func export(as rasterFormat: ExportableRasterFormat = .png) throws -> Data {
+        return try export(using: rasterFormat)
+    }
 }
 
 public struct Point: Equatable {
