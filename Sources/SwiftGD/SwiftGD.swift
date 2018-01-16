@@ -388,14 +388,14 @@ extension Color {
     ///   representation **including** an alpha component. Each single character will be
     ///   doubled before conversion. Example: `feba` -> `ffeebbaa`
     /// - Is a string with 3-characters and therefore a shortened hexadecimal color
-    ///   representation **excluding** an alpha component. Given RGB color charaacter will
+    ///   representation **excluding** an alpha component. Given RGB color character will
     ///   be doubled and an alpha of component of `0xff` (opaque) will be extended before
     ///   conversion. Example: `feb` -> `ffeebbff`
     ///
     /// - Parameters:
     ///   - string: The hexadecimal color string.
     ///   - leadingAlpha: Indicate whether given string should be treated as ARGB (`true`) or RGBA (`false`)
-    /// - Throws: `.invalidColor` if given string does not match any of the above mentioned critera or is not a hex valid color.
+    /// - Throws: `.invalidColor` if given string does not match any of the above mentioned critera or is not a valid hex color.
     public convenience init(hex string: String, leadingAlpha: Bool = false) throws {
         let string = try Color.sanitize(hex: string, leadingAlpha: leadingAlpha)
         guard let code = Int(string, radix: 16) else {
