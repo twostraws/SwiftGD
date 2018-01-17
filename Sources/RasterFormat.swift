@@ -37,9 +37,6 @@ private typealias RasterFormatter = ImportableRasterFormatter & ExportableRaster
 
 // MARK: - Generic LibGd RasterFormatter
 
-/// Defines the quality of compressable image export operations
-public typealias Quality = Int32
-
 /// Defines a formatter to be used on one libgd built-in raster format import conversions
 private protocol LibGdImportableRasterFormatter: ImportableRasterFormatter {
 
@@ -55,29 +52,22 @@ private protocol LibGdExportableRasterFormatter: ExportableRasterFormatter {
 }
 
 /// Defines a formatter to be used on one of libgd built-in raster format with **compressable** export conversions
-private protocol LibGdCompressableExportRasterFormatter: ExportableRasterFormatter {
+private protocol LibGdParametrizableExportRasterFormatter: ExportableRasterFormatter {
 
-    /// The image quality to apply on export operations
-    var quality: Quality { get }
+    /// The parameters to apply on exports
+    var exportParameters: Int32 { get }
 
     /// Function pointer to one of libgd's build in image export functions
-    var exportFunction: (_ im: gdImagePtr, _ size: UnsafeMutablePointer<Int32>, _ quality: Int32) -> UnsafeMutableRawPointer? { get }
+    var exportFunction: (_ im: gdImagePtr, _ size: UnsafeMutablePointer<Int32>, _ parameters: Int32) -> UnsafeMutableRawPointer? { get }
 }
 
 /// Defines a formatter to be used on both, import & export, of one of libgd raster format with **none**-compressable export conversions
 private typealias LibGdRasterFormatter = LibGdImportableRasterFormatter & LibGdExportableRasterFormatter
 
 /// Defines a formatter to be used on both, import & export, of one of libgd built-in raster format with **compressable** export conversions
-private typealias LibGdCompressableRasterFormatter = LibGdImportableRasterFormatter & LibGdCompressableExportRasterFormatter
+private typealias LibGdParametrizableRasterFormatter = LibGdImportableRasterFormatter & LibGdParametrizableExportRasterFormatter
 
 // MARK: - Common Functions
-
-extension Quality {
-
-    /// libgd uses -1 as "default quality indicator"
-    /// Reference: https://libgd.github.io/manuals/2.2.4/files/gd_jpeg-c.html
-    public static let `default`: Quality = -1
-}
 
 extension LibGdImportableRasterFormatter {
 
@@ -111,7 +101,7 @@ extension LibGdExportableRasterFormatter {
     }
 }
 
-extension LibGdCompressableExportRasterFormatter {
+extension LibGdParametrizableExportRasterFormatter {
 
     /// Creates a data representation of given `gdImagePtr`.
     ///
@@ -120,8 +110,7 @@ extension LibGdCompressableExportRasterFormatter {
     /// - Throws: `Error` if export failed.
     fileprivate func data(of imagePtr: gdImagePtr) throws -> Data {
         var size: Int32 = 0
-        let quality = min(max(self.quality, -1), 100)
-        guard let bytesPtr = exportFunction(imagePtr, &size, quality) else {
+        guard let bytesPtr = exportFunction(imagePtr, &size, exportParameters) else {
             throw Error.invalidRasterFormat
         }
         return Data(bytes: bytesPtr, count: Int(size))
@@ -131,10 +120,19 @@ extension LibGdCompressableExportRasterFormatter {
 // MARK: - Concrete LibGd RasterFormatter
 
 /// Defines a formatter to be used on BMP import & export conversions
-private struct BMPRasterFormatter: LibGdCompressableRasterFormatter {
+private struct BMPRasterFormatter: LibGdParametrizableRasterFormatter {
 
-    /// The image quality to apply on export operations
-    fileprivate var quality: Quality = .default
+    /// The parameters to apply on exports
+    fileprivate var exportParameters: Int32
+
+    /// Initializes a new instance of `Self` using given RLE compression option on exports
+    ///
+    /// - Parameter compression:
+    ///     Indicates whether to apply RLE compression on export or not. Defaults to `false`.
+    ///     See [Reference](https://libgd.github.io/manuals/2.2.5/files/gd_bmp-c.html)
+    init(compression: Bool = false) {
+        exportParameters = compression ? 1 : 0
+    }
 
     /// Function pointer to libgd's built-in bmp image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromBmpPtr
@@ -154,10 +152,21 @@ private struct GIFRasterFormatter: LibGdRasterFormatter {
 }
 
 /// Defines a formatter to be used on JPEG import & export conversions
-private struct JPGRasterFormatter: LibGdCompressableRasterFormatter {
+private struct JPGRasterFormatter: LibGdParametrizableRasterFormatter {
 
-    /// The image quality to apply on export operations
-    fileprivate var quality: Quality = .default
+    /// The parameters to apply on exports
+    fileprivate let exportParameters: Int32
+
+    /// Initializes a new instance of `Self` using given quality on exports
+    /// For practical purposes, the quality should be a value in the range `0...95`. For values less than or equal `0` or
+    /// lower, the IJG JPEG quality value (which should yield a good general quality / size tradeoff for most situations) is used.
+    ///
+    /// - Parameter quality:
+    ///     Compression quality to apply on exports. Defaults to -1.
+    ///     See [Reference](https://libgd.github.io/manuals/2.2.5/files/gd_jpeg-c.html)
+    init(quality: Int32 = -1) {
+        exportParameters = quality
+    }
 
     /// Function pointer to libgd's built-in jpeg image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromJpegPtr
@@ -194,10 +203,19 @@ private struct TGARasterFormatter: LibGdImportableRasterFormatter {
 }
 
 /// Defines a formatter to be used on WBMP import & export conversions
-private struct WBMPRasterFormatter: LibGdCompressableRasterFormatter {
+private struct WBMPRasterFormatter: LibGdParametrizableRasterFormatter {
 
-    /// The image quality to apply on export operations
-    fileprivate var quality: Quality = .default
+    /// The parameters to apply on exports
+    fileprivate let exportParameters: Int32
+
+    /// Initializes a new instance of `Self` using index as foreground color on exports
+    ///
+    /// - Parameter index:
+    ///     The index of the foreground color used on exports. Any other value will be considered as background and will not be written.
+    ///     See [Reference](https://libgd.github.io/manuals/2.2.5/files/gd_wbmp-c.html)
+    init(index: Int32) {
+        exportParameters = index
+    }
 
     /// Function pointer to libgd's built-in wbmp image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromWBMPPtr
@@ -253,7 +271,7 @@ public enum ImportableRasterFormat: ImportableRasterFormatter {
         case .png: return try PNGRasterFormatter().imagePtr(of: data)
         case .tiff: return try TIFFRasterFormatter().imagePtr(of: data)
         case .tga: return try TGARasterFormatter().imagePtr(of: data)
-        case .wbmp: return try WBMPRasterFormatter().imagePtr(of: data)
+        case .wbmp: return try WBMPRasterFormatter(index: -1).imagePtr(of: data)
         case .webp: return try WEBPRasterFormatter().imagePtr(of: data)
         case .any:
             return try ([
@@ -274,12 +292,12 @@ public enum ImportableRasterFormat: ImportableRasterFormatter {
 /// - webp: https://en.wikipedia.org/wiki/webp
 /// - any: Evaluates all of the above mentioned formats on export
 public enum ExportableRasterFormat: ExportableRasterFormatter {
-    case bmp(quality: Quality)
+    case bmp(compression: Bool)
     case gif
-    case jpg(quality: Quality)
+    case jpg(quality: Int32)
     case png
     case tiff
-    case wbmp(quality: Quality)
+    case wbmp(index: Int32)
     case webp
 
     /// Creates a data representation of given `gdImagePtr`.
@@ -291,9 +309,9 @@ public enum ExportableRasterFormat: ExportableRasterFormatter {
         switch self {
 
         // Compressable image raster format
-        case let .bmp(quality): return try BMPRasterFormatter(quality: quality).data(of: imagePtr)
+        case let .bmp(compression): return try BMPRasterFormatter(compression: compression).data(of: imagePtr)
         case let .jpg(quality): return try JPGRasterFormatter(quality: quality).data(of: imagePtr)
-        case let .wbmp(quality): return try WBMPRasterFormatter(quality: quality).data(of: imagePtr)
+        case let .wbmp(index): return try WBMPRasterFormatter(index: index).data(of: imagePtr)
 
         // None compressable image raster format
         case .gif: return try GIFRasterFormatter().data(of: imagePtr)
