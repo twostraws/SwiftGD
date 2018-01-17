@@ -11,7 +11,7 @@ import Foundation
 // MARK: - Importable & Exportable RasterFormatter
 
 /// Defines a formatter to be used on import (from data/file to gdImage) conversions
-public protocol ImportableRasterFormatter {
+private protocol ImportableRasterFormatter {
 
     /// Creates a `gdImagePtr` from given image data.
     ///
@@ -22,7 +22,7 @@ public protocol ImportableRasterFormatter {
 }
 
 /// Defines a formatter to be used on export (from gdImage to data/file) conversions
-public protocol ExportableRasterFormatter {
+private protocol ExportableRasterFormatter {
 
     /// Creates a data representation of given `gdImagePtr`.
     ///
@@ -33,7 +33,7 @@ public protocol ExportableRasterFormatter {
 }
 
 /// Defines a formatter that can be used on both, import & export, conversions
-public typealias RasterFormatter = ImportableRasterFormatter & ExportableRasterFormatter
+private typealias RasterFormatter = ImportableRasterFormatter & ExportableRasterFormatter
 
 // MARK: - Generic LibGd RasterFormatter
 
@@ -41,21 +41,21 @@ public typealias RasterFormatter = ImportableRasterFormatter & ExportableRasterF
 public typealias Quality = Int32
 
 /// Defines a formatter to be used on one libgd built-in raster format import conversions
-public protocol LibGdImportableRasterFormatter: ImportableRasterFormatter {
+private protocol LibGdImportableRasterFormatter: ImportableRasterFormatter {
 
     /// Function pointer to one of libgd's build in image create functions
     var importFunction: (_ size: Int32, _ data: UnsafeMutableRawPointer) -> gdImagePtr? { get }
 }
 
 /// Defines a formatter to be used on one of libgd built-in raster format with **none**-compressable export conversions
-public protocol LibGdExportableRasterFormatter: ExportableRasterFormatter {
+private protocol LibGdExportableRasterFormatter: ExportableRasterFormatter {
 
     /// Function pointer to one of libgd's build in image export functions
     var exportFunction: (_ im: gdImagePtr, _ size: UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? { get }
 }
 
 /// Defines a formatter to be used on one of libgd built-in raster format with **compressable** export conversions
-public protocol LibGdCompressableExportRasterFormatter: ExportableRasterFormatter {
+private protocol LibGdCompressableExportRasterFormatter: ExportableRasterFormatter {
 
     /// The image quality to apply on export operations
     var quality: Quality { get }
@@ -65,10 +65,10 @@ public protocol LibGdCompressableExportRasterFormatter: ExportableRasterFormatte
 }
 
 /// Defines a formatter to be used on both, import & export, of one of libgd raster format with **none**-compressable export conversions
-public typealias LibGdRasterFormatter = LibGdImportableRasterFormatter & LibGdExportableRasterFormatter
+private typealias LibGdRasterFormatter = LibGdImportableRasterFormatter & LibGdExportableRasterFormatter
 
 /// Defines a formatter to be used on both, import & export, of one of libgd built-in raster format with **compressable** export conversions
-public typealias LibGdCompressableRasterFormatter = LibGdImportableRasterFormatter & LibGdCompressableExportRasterFormatter
+private typealias LibGdCompressableRasterFormatter = LibGdImportableRasterFormatter & LibGdCompressableExportRasterFormatter
 
 // MARK: - Common Functions
 
@@ -86,7 +86,7 @@ extension LibGdImportableRasterFormatter {
     /// - Parameter data: The image data of which an image should be instantiated.
     /// - Returns: The `gdImagePtr` of the instantiated image.
     /// - Throws: `Error` if import failed.
-    public func imagePtr(of data: Data) throws -> gdImagePtr {
+    fileprivate func imagePtr(of data: Data) throws -> gdImagePtr {
         let (pointer, size) = try data.memory()
         guard let imagePtr = importFunction(size, pointer) else {
             throw Error.invalidRasterFormat
@@ -102,7 +102,7 @@ extension LibGdExportableRasterFormatter {
     /// - Parameter imagePtr: The `gdImagePtr` of which a data representation should be instantiated.
     /// - Returns: The (raw) `Data` of the image
     /// - Throws: `Error` if export failed.
-    public func data(of imagePtr: gdImagePtr) throws -> Data {
+    fileprivate func data(of imagePtr: gdImagePtr) throws -> Data {
         var size: Int32 = 0
         guard let bytesPtr = exportFunction(imagePtr, &size) else {
             throw Error.invalidRasterFormat
@@ -118,7 +118,7 @@ extension LibGdCompressableExportRasterFormatter {
     /// - Parameter imagePtr: The `gdImagePtr` of which a data representation should be instantiated.
     /// - Returns: The (raw) `Data` of the image
     /// - Throws: `Error` if export failed.
-    public func data(of imagePtr: gdImagePtr) throws -> Data {
+    fileprivate func data(of imagePtr: gdImagePtr) throws -> Data {
         var size: Int32 = 0
         let quality = min(max(self.quality, -1), 100)
         guard let bytesPtr = exportFunction(imagePtr, &size, quality) else {
@@ -131,89 +131,89 @@ extension LibGdCompressableExportRasterFormatter {
 // MARK: - Concrete LibGd RasterFormatter
 
 /// Defines a formatter to be used on BMP import & export conversions
-public struct BMPRasterFormatter: LibGdCompressableRasterFormatter {
+private struct BMPRasterFormatter: LibGdCompressableRasterFormatter {
 
     /// The image quality to apply on export operations
-    public var quality: Quality = .default
+    fileprivate var quality: Quality = .default
 
     /// Function pointer to libgd's built-in bmp image create function
-    public let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromBmpPtr
+    fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromBmpPtr
 
     /// Function pointer to libgd's built-in bmp image export function
-    public let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>, Int32) -> UnsafeMutableRawPointer? = gdImageBmpPtr
+    fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>, Int32) -> UnsafeMutableRawPointer? = gdImageBmpPtr
 }
 
 /// Defines a formatter to be used on GIF import & export conversions
-public struct GIFRasterFormatter: LibGdRasterFormatter {
+private struct GIFRasterFormatter: LibGdRasterFormatter {
 
     /// Function pointer to libgd's built-in gif image create function
-    public let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromGifPtr
+    fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromGifPtr
 
     /// Function pointer to libgd's built-in gif image export function
-    public let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageGifPtr
+    fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageGifPtr
 }
 
 /// Defines a formatter to be used on JPEG import & export conversions
-public struct JPGRasterFormatter: LibGdCompressableRasterFormatter {
+private struct JPGRasterFormatter: LibGdCompressableRasterFormatter {
 
     /// The image quality to apply on export operations
-    public var quality: Quality = .default
+    fileprivate var quality: Quality = .default
 
     /// Function pointer to libgd's built-in jpeg image create function
-    public let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromJpegPtr
+    fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromJpegPtr
 
     /// Function pointer to libgd's built-in jpeg image export function
-    public let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>, Int32) -> UnsafeMutableRawPointer? = gdImageJpegPtr
+    fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>, Int32) -> UnsafeMutableRawPointer? = gdImageJpegPtr
 }
 
 /// Defines a formatter to be used on PNG import & export conversions
-public struct PNGRasterFormatter: LibGdRasterFormatter {
+private struct PNGRasterFormatter: LibGdRasterFormatter {
 
     /// Function pointer to libgd's built-in png image create function
-    public let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromPngPtr
+    fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromPngPtr
 
     /// Function pointer to libgd's built-in png image export function
-    public let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImagePngPtr
+    fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImagePngPtr
 }
 
 /// Defines a formatter to be used on TIFF import & export conversions
-public struct TIFFRasterFormatter: LibGdRasterFormatter {
+private struct TIFFRasterFormatter: LibGdRasterFormatter {
 
     /// Function pointer to libgd's built-in tiff image create function
-    public let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromTiffPtr
+    fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromTiffPtr
 
     /// Function pointer to libgd's built-in tiff image export function
-    public let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageTiffPtr
+    fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageTiffPtr
 }
 
 /// Defines a formatter to be used on TGA import & export conversions
-public struct TGARasterFormatter: LibGdImportableRasterFormatter {
+private struct TGARasterFormatter: LibGdImportableRasterFormatter {
 
     /// Function pointer to libgd's built-in tga image create function
-    public let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromTgaPtr
+    fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromTgaPtr
 }
 
 /// Defines a formatter to be used on WBMP import & export conversions
-public struct WBMPRasterFormatter: LibGdCompressableRasterFormatter {
+private struct WBMPRasterFormatter: LibGdCompressableRasterFormatter {
 
     /// The image quality to apply on export operations
-    public var quality: Quality = .default
+    fileprivate var quality: Quality = .default
 
     /// Function pointer to libgd's built-in wbmp image create function
-    public let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromWBMPPtr
+    fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromWBMPPtr
 
     /// Function pointer to libgd's built-in wbmp image export function
-    public let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>, Int32) -> UnsafeMutableRawPointer? = gdImageWBMPPtr
+    fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>, Int32) -> UnsafeMutableRawPointer? = gdImageWBMPPtr
 }
 
 /// Defines a formatter to be used on WEBP import & export conversions
-public struct WEBPRasterFormatter: LibGdRasterFormatter {
+private struct WEBPRasterFormatter: LibGdRasterFormatter {
 
     /// Function pointer to libgd's built-in webp image create function
-    public let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromWebpPtr
+    fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromWebpPtr
 
     /// Function pointer to libgd's built-in webp image export function
-    public let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageWebpPtr
+    fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageWebpPtr
 }
 
 // MARK: - Convenience Raster Format
@@ -325,7 +325,7 @@ extension Collection where Element: ImportableRasterFormatter {
     /// - Parameter data: The image data of which an image should be instantiated.
     /// - Returns: The `gdImagePtr` of the instantiated image.
     /// - Throws: `Error` if import failed.
-    public func imagePtr(of data: Data) throws -> gdImagePtr {
+    fileprivate func imagePtr(of data: Data) throws -> gdImagePtr {
         for rasterFormat in self {
             if let imagePtr = try? rasterFormat.imagePtr(of: data) {
                 return imagePtr

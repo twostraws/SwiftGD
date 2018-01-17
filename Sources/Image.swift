@@ -254,17 +254,6 @@ extension Image {
     }
 
     /// Initializes a new `Image` instance from given image data in specified raster format.
-    /// If `ImageRasterFormat` is omitted, all supported raster formats will be evaluated.
-    ///
-    /// - Parameters:
-    ///   - data: The image data
-    ///   - rasterFormatter: An `ImportableRasterFormatter` instance that manages import conversion
-    /// - Throws: `Error` if `data` in `rasterFormat` could not be converted
-    public convenience init(data: Data, using rasterFormatter: ImportableRasterFormatter) throws {
-        try self.init(gdImage: rasterFormatter.imagePtr(of: data))
-    }
-
-    /// Initializes a new `Image` instance from given image data in specified raster format.
     /// If `DefaultImportableRasterFormat` is omitted, all supported raster formats will be evaluated.
     ///
     /// - Parameters:
@@ -272,16 +261,7 @@ extension Image {
     ///   - rasterFormat: The raster format of image data (e.g. png, webp, ...). Defaults to `.any`
     /// - Throws: `Error` if `data` in `rasterFormat` could not be converted
     public convenience init(data: Data, as rasterFormat: ImportableRasterFormat = .any) throws {
-        try self.init(data: data, using: rasterFormat)
-    }
-
-    /// Exports the image as `Data` object in specified raster format.
-    ///
-    /// - Parameter rasterFormatter: An `ExportableRasterFormatter` instance that manages export conversion
-    /// - Returns: The image data
-    /// - Throws: `Error` if the export of `self` in specified raster format failed.
-    public func export(using rasterFormatter: ExportableRasterFormatter) throws -> Data {
-        return try rasterFormatter.data(of: internalImage)
+        try self.init(gdImage: rasterFormat.imagePtr(of: data))
     }
 
     /// Exports the image as `Data` object in specified raster format.
@@ -290,6 +270,6 @@ extension Image {
     /// - Returns: The image data
     /// - Throws: `Error` if the export of `self` in specified raster format failed.
     public func export(as rasterFormat: ExportableRasterFormat = .png) throws -> Data {
-        return try export(using: rasterFormat)
+        return try rasterFormat.data(of: internalImage)
     }
 }
