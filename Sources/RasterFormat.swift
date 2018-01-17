@@ -257,8 +257,7 @@ public enum ImportableRasterFormat: ImportableRasterFormatter {
         case .webp: return try WEBPRasterFormatter().imagePtr(of: data)
         case .any:
             return try ([
-                .bmp, .jpg, .wbmp, .gif,
-                .png, .tiff, .webp
+                .jpg, .png, .gif, .webp, .tiff, .bmp, .wbmp
             ] as [ImportableRasterFormat]).imagePtr(of: data)
         }
     }
