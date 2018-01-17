@@ -260,16 +260,16 @@ extension Image {
     ///   - data: The image data
     ///   - rasterFormat: The raster format of image data (e.g. png, webp, ...). Defaults to `.any`
     /// - Throws: `Error` if `data` in `rasterFormat` could not be converted
-    public convenience init(data: Data, as rasterFormat: ImportableRasterFormat = .any) throws {
-        try self.init(gdImage: rasterFormat.imagePtr(of: data))
+    public convenience init(data: Data, as format: ImportableFormat = .any) throws {
+        try self.init(gdImage: format.imagePtr(of: data))
     }
 
     /// Exports the image as `Data` object in specified raster format.
     ///
-    /// - Parameter rasterFormat: The raster format of the returning image data (e.g. as jpg, png, ...). Defaults to `.png`
+    /// - Parameter format: The raster format of the returning image data (e.g. as jpg, png, ...). Defaults to `.png`
     /// - Returns: The image data
     /// - Throws: `Error` if the export of `self` in specified raster format failed.
-    public func export(as rasterFormat: ExportableRasterFormat = .png) throws -> Data {
-        return try rasterFormat.data(of: internalImage)
+    public func export(as format: ExportableFormat = .png) throws -> Data {
+        return try format.data(of: internalImage)
     }
 }
