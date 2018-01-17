@@ -60,7 +60,7 @@ extension Color {
     /// - Parameters:
     ///   - string: The hexadecimal color string.
     ///   - leadingAlpha: Indicate whether given string should be treated as ARGB (`true`) or RGBA (`false`)
-    /// - Throws: `.invalidColor` if given string does not match any of the above mentioned critera or is not a valid hex color.
+    /// - Throws: `.invalidColor` if given string does not match any of the above mentioned criteria or is not a valid hex color.
     public init(hex string: String, leadingAlpha: Bool = false) throws {
         let string = try Color.sanitize(hex: string, leadingAlpha: leadingAlpha)
         guard let code = Int(string, radix: 16) else {
