@@ -14,7 +14,12 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "SwiftGD"
+            name: "SwiftGD",
+            path: "Sources"
+        ),
+        .testTarget(
+            name: "SwiftGDTests",
+            dependencies: ["SwiftGD"]
         )
     ]
 )
