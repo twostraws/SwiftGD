@@ -233,7 +233,7 @@ extension Image {
 
         if !allowOverwrite {
             // refuse to overwrite existing files
-            guard   fm.fileExists(atPath: url.path) == false else { return false }
+            guard fm.fileExists(atPath: url.path) == false else { return false }
         }
 
         // open our output file, then defer it to close
