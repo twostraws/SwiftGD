@@ -225,14 +225,16 @@ extension Image {
     }
 
     @discardableResult
-    public func write(to url: URL, quality: Int = 100) -> Bool {
+    public func write(to url: URL, quality: Int = 100, allowOverwrite: Bool = false) -> Bool {
         let fileType = url.pathExtension.lowercased()
         guard fileType == "png" || fileType == "jpeg" || fileType == "jpg" else { return false }
 
         let fm = FileManager()
 
-        // refuse to overwrite existing files
-        guard fm.fileExists(atPath: url.path) == false else { return false }
+        if !allowOverwrite {
+            // refuse to overwrite existing files
+            guard   fm.fileExists(atPath: url.path) == false else { return false }
+        }
 
         // open our output file, then defer it to close
         let outputFile = fopen(url.path, "wb")
