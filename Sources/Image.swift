@@ -194,6 +194,11 @@ public class Image {
 		gdImageGrayScale(internalImage)
 	}
 
+	public func transparent(enabled: Bool) {
+		gdImageSaveAlpha(internalImage, enabled ? 1 : 0)
+		gdImageAlphaBlending(internalImage, enabled ? 0 : 1)
+	}
+
 	deinit {
 		// always destroy our internal image resource
 		gdImageDestroy(internalImage)
