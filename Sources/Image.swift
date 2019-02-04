@@ -21,6 +21,13 @@ public class Image {
 		return Size(width: internalImage.pointee.sx, height: internalImage.pointee.sy)
 	}
 
+	public var transparent: Bool = false {
+		didSet {
+			gdImageSaveAlpha(internalImage, transparent ? 1 : 0)
+			gdImageAlphaBlending(internalImage, transparent ? 0 : 1)
+		}
+	}
+
 	public init?(width: Int, height: Int) {
 		internalImage = gdImageCreateTrueColor(Int32(width), Int32(height))
 	}
