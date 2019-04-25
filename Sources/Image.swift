@@ -65,8 +65,8 @@ public class Image {
 		return Image(gdImage: output)
 	}
 
-    public func cropped(from: Point, size: Size) -> Image? {
-        var rect = gdRect(x: Int32(from.x), y: Int32(from.y), width: Int32(size.width), height: Int32(size.height))
+    public func cropped(rect: Rectangle) -> Image? {
+        var rect = gdRect(x: Int32(rect.point.x), y: Int32(rect.point.y), width: Int32(rect.size.width), height: Int32(rect.size.height))
 
         guard let output = gdImageCrop(internalImage, &rect) else { return nil }
         return Image(gdImage: output)
