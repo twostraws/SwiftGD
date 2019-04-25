@@ -4,7 +4,6 @@ import Foundation
 
 /// A structure that contains a point in a two-dimensional coordinate system.
 public struct Point {
-
     /// The x-coordinate of the point.
     public var x: Int
 
@@ -23,7 +22,6 @@ public struct Point {
 }
 
 extension Point {
-
     /// The point at the origin (0,0).
     public static let zero = Point(x: 0, y: 0)
 
@@ -38,7 +36,6 @@ extension Point {
 }
 
 extension Point: Equatable {
-
     /// Returns a Boolean value indicating whether two values are equal.
     ///
     /// Equality is the inverse of inequality. For any values `a` and `b`,
@@ -56,7 +53,6 @@ extension Point: Equatable {
 
 /// A structure that represents a two-dimensional size.
 public struct Size {
-
     /// The width value of the size.
     public var width: Int
 
@@ -75,7 +71,6 @@ public struct Size {
 }
 
 extension Size {
-
     /// Size whose width and height are both zero.
     public static let zero = Size(width: 0, height: 0)
 
@@ -90,7 +85,6 @@ extension Size {
 }
 
 extension Size: Comparable {
-
     /// Returns a Boolean value indicating whether the value of the first
     /// argument is less than that of the second argument.
     ///
@@ -122,7 +116,6 @@ extension Size: Comparable {
 
 /// A structure that represents a rectangle.
 public struct Rectangle {
-
     /// The origin of the rectangle.
     public var point: Point
 
@@ -141,7 +134,6 @@ public struct Rectangle {
 }
 
 extension Rectangle {
-
     /// Rectangle at the origin whose width and height are both zero.
     public static let zero = Rectangle(point: .zero, size: .zero)
 
@@ -169,7 +161,6 @@ extension Rectangle {
 }
 
 extension Rectangle: Equatable {
-
     /// Returns a Boolean value indicating whether two values are equal.
     ///
     /// Equality is the inverse of inequality. For any values `a` and `b`,
@@ -182,4 +173,3 @@ extension Rectangle: Equatable {
         return lhs.point == rhs.point && lhs.size == rhs.size
     }
 }
-

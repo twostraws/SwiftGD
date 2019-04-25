@@ -8,6 +8,7 @@ SwiftGD wraps GD inside classes to make it easier to use, and provides the follo
 - Writing images back to disk as PNG or JPEG.
 - Creating new images at a specific width and height.
 - Resizing to a specific width or height.
+- Cropping at a location and size.
 - Flood filling a color from a coordinate.
 - Drawing lines
 - Reading and writing individual pixels.
@@ -38,6 +39,7 @@ SwiftGD provides four classes for basic image operations:
 - `Image` is responsible for loading, saving, and manipulating image data.
 - `Point` stores `x` and `y` coordinates as integers.
 - `Size` stores `width` and `height` integers.
+- `Rectangle` combines `Point` and `Size` into one value.
 - `Color` provides red, green, blue, and alpha components stored in a `Double` from 0 to 1, as well as some built-in colors to get you started.
 
 These are implemented as classes rather than structs because only classes have deinitializers. These are required so that GD's memory can be cleaned up when an image is destroyed.
@@ -90,13 +92,16 @@ let data = try image?.export(as: .png)
 
 This will return the data representation of a red PNG image with 500x500px in size.
 
-Images are also created when performing a resize operation, which means your original image is untouched. You have three options for resizing:
+Images are also created when performing a resize or crop operation, which means your original image is untouched. You have three options for resizing:
 
 - `resizedTo(width:height:)` lets you stretch an image to any dimensions.
 - `resizedTo(width:)` resizes an image to a specific width, and calculates the correct height to maintain the original aspect ratio.
 - `resizedTo(height:)` resizes an image to a specific height, and calculates the correct width to maintain the original aspect ratio.
 
 All three have an optional extra parameter, `applySmoothing`. When set to true (the default) the resize is performed using bilinear filter. When false, the resize is performed using nearest neighbor, and the result is likely to look jagged.
+
+To crop an image, call its `cropped(to:)` method, passing in the `Rectangle` that specifies the crop origin and size.
+
 
 
 ## Drawing shapes and colors

@@ -1,7 +1,6 @@
 import Foundation
 
 public struct Color {
-
     public var redComponent: Double
     public var greenComponent: Double
     public var blueComponent: Double
@@ -18,7 +17,6 @@ public struct Color {
 // MARK: Constants
 
 extension Color {
-
     public static let red = Color(red: 1, green: 0, blue: 0, alpha: 1)
 
     public static let green = Color(red: 0, green: 1, blue: 0, alpha: 1)
@@ -33,7 +31,6 @@ extension Color {
 // MARK: Hexadecimal
 
 extension Color {
-
     /// The maximum representable integer for each color component.
     private static let maxHex: Int = 0xff
 
@@ -118,4 +115,3 @@ extension Color {
         }
     }
 }
-

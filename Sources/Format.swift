@@ -12,7 +12,6 @@ import Foundation
 
 /// Defines a formatter to be used on import (from data/file to gdImage) conversions
 private protocol ImportableFormatter {
-
     /// Creates a `gdImagePtr` from given image data.
     ///
     /// - Parameter data: The image data of which an image should be instantiated.
@@ -23,7 +22,6 @@ private protocol ImportableFormatter {
 
 /// Defines a formatter to be used on export (from gdImage to data/file) conversions
 private protocol ExportableFormatter {
-
     /// Creates a data representation of given `gdImagePtr`.
     ///
     /// - Parameter imagePtr: The `gdImagePtr` of which a data representation should be instantiated.
@@ -39,21 +37,18 @@ private typealias Formatter = ImportableFormatter & ExportableFormatter
 
 /// Defines a formatter to be used on one libgd built-in format import conversions
 private protocol LibGdImportableFormatter: ImportableFormatter {
-
     /// Function pointer to one of libgd's build in image create functions
     var importFunction: (_ size: Int32, _ data: UnsafeMutableRawPointer) -> gdImagePtr? { get }
 }
 
 /// Defines a formatter to be used on one of libgd built-in format with **none**-parametrizable export conversions
 private protocol LibGdExportableFormatter: ExportableFormatter {
-
     /// Function pointer to one of libgd's build in image export functions
     var exportFunction: (_ im: gdImagePtr, _ size: UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? { get }
 }
 
 /// Defines a formatter to be used on one of libgd built-in format with **parametrizable** export conversions
 private protocol LibGdParametrizableExportFormatter: ExportableFormatter {
-
     /// The parameters to apply on exports
     var exportParameters: Int32 { get }
 
@@ -70,7 +65,6 @@ private typealias LibGdParametrizableFormatter = LibGdImportableFormatter & LibG
 // MARK: - Common Functions
 
 extension LibGdImportableFormatter {
-
     /// Creates a `gdImagePtr` from given image data.
     ///
     /// - Parameter data: The image data of which an image should be instantiated.
@@ -86,7 +80,6 @@ extension LibGdImportableFormatter {
 }
 
 extension LibGdExportableFormatter {
-
     /// Creates a data representation of given `gdImagePtr`.
     ///
     /// - Parameter imagePtr: The `gdImagePtr` of which a data representation should be instantiated.
@@ -102,7 +95,6 @@ extension LibGdExportableFormatter {
 }
 
 extension LibGdParametrizableExportFormatter {
-
     /// Creates a data representation of given `gdImagePtr`.
     ///
     /// - Parameter imagePtr: The `gdImagePtr` of which a data representation should be instantiated.
@@ -121,7 +113,6 @@ extension LibGdParametrizableExportFormatter {
 
 /// Defines a formatter to be used on BMP import & export conversions
 private struct BMPFormatter: LibGdParametrizableFormatter {
-
     /// The parameters to apply on exports
     fileprivate var exportParameters: Int32
 
@@ -143,7 +134,6 @@ private struct BMPFormatter: LibGdParametrizableFormatter {
 
 /// Defines a formatter to be used on GIF import & export conversions
 private struct GIFFormatter: LibGdFormatter {
-
     /// Function pointer to libgd's built-in gif image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromGifPtr
 
@@ -153,7 +143,6 @@ private struct GIFFormatter: LibGdFormatter {
 
 /// Defines a formatter to be used on JPEG import & export conversions
 private struct JPGFormatter: LibGdParametrizableFormatter {
-
     /// The parameters to apply on exports
     fileprivate let exportParameters: Int32
 
@@ -177,7 +166,6 @@ private struct JPGFormatter: LibGdParametrizableFormatter {
 
 /// Defines a formatter to be used on PNG import & export conversions
 private struct PNGFormatter: LibGdFormatter {
-
     /// Function pointer to libgd's built-in png image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromPngPtr
 
@@ -187,7 +175,6 @@ private struct PNGFormatter: LibGdFormatter {
 
 /// Defines a formatter to be used on TIFF import & export conversions
 private struct TIFFFormatter: LibGdFormatter {
-
     /// Function pointer to libgd's built-in tiff image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromTiffPtr
 
@@ -197,14 +184,12 @@ private struct TIFFFormatter: LibGdFormatter {
 
 /// Defines a formatter to be used on TGA import & export conversions
 private struct TGAFormatter: LibGdImportableFormatter {
-
     /// Function pointer to libgd's built-in tga image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromTgaPtr
 }
 
 /// Defines a formatter to be used on WBMP import & export conversions
 private struct WBMPFormatter: LibGdParametrizableFormatter {
-
     /// The parameters to apply on exports
     fileprivate let exportParameters: Int32
 
@@ -226,7 +211,6 @@ private struct WBMPFormatter: LibGdParametrizableFormatter {
 
 /// Defines a formatter to be used on WEBP import & export conversions
 private struct WEBPFormatter: LibGdFormatter {
-
     /// Function pointer to libgd's built-in webp image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromWebpPtr
 
@@ -325,7 +309,6 @@ public enum ExportableFormat: ExportableFormatter {
 // MARK: Private helper
 
 extension Data {
-
     /// Returns a reference of the raw pointer to the data array and the array size
     fileprivate func memory() throws -> (pointer: UnsafeMutableRawPointer, size: Int32) {
         // Bytes must not exceed int32 as limit by `gdImageCreate..Ptr()`
@@ -337,7 +320,6 @@ extension Data {
 }
 
 extension Collection where Element: ImportableFormatter {
-
     /// Creates a `gdImagePtr` from given image data.
     ///
     /// - Parameter data: The image data of which an image should be instantiated.
