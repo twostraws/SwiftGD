@@ -65,6 +65,13 @@ public class Image {
 		return Image(gdImage: output)
 	}
 
+    public func cropped(from: Point, size: Size) -> Image? {
+        var rect = gdRect(x: Int32(from.x), y: Int32(from.y), width: Int32(size.width), height: Int32(size.height))
+
+        guard let output = gdImageCrop(internalImage, &rect) else { return nil }
+        return Image(gdImage: output)
+    }
+
 	public func applyInterpolation(enabled: Bool, currentSize: Size, newSize: Size) {
 		guard enabled else {
 			gdImageSetInterpolationMethod(internalImage, GD_NEAREST_NEIGHBOUR)
