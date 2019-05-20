@@ -1,0 +1,4 @@
+module gd {
+	umbrella header "gd.h"
+	link "gd"
+}

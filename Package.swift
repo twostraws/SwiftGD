@@ -9,17 +9,10 @@ let package = Package(
             targets: ["SwiftGD"]
         )
     ],
-    dependencies: [
-        .package(url: "https://github.com/twostraws/Cgd.git", .upToNextMinor(from: "0.3.0"))
-    ],
+    dependencies: [],
     targets: [
-        .target(
-            name: "SwiftGD",
-            path: "Sources"
-        ),
-        .testTarget(
-            name: "SwiftGDTests",
-            dependencies: ["SwiftGD"]
-        )
+        .systemLibrary(name: "gd", pkgConfig: "gdlib", providers: [.apt(["libgd-dev"]), .brew(["gd"])]),
+        .target(name: "SwiftGD", dependencies: ["gd"]),
+        .testTarget(name: "SwiftGDTests", dependencies: ["SwiftGD"])
     ]
 )
