@@ -1,4 +1,4 @@
-// swift-tools-version:4.0
+// swift-tools-version:5.0
 import PackageDescription
 
 let package = Package(
@@ -10,7 +10,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/twostraws/Cgd.git", .upToNextMinor(from: "0.2.0"))
+        .package(url: "https://github.com/twostraws/Cgd.git", .upToNextMinor(from: "0.3.0"))
     ],
     targets: [
         .target(
