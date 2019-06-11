@@ -1,4 +1,4 @@
 module gd {
-	umbrella header "gd.h"
+	umbrella header "swiftgd_gd.h"
 	link "gd"
 }
