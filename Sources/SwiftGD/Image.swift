@@ -206,6 +206,18 @@ public class Image {
     public func desaturate() {
         gdImageGrayScale(internalImage)
     }
+    
+    /// Reduces `Image` to an indexed palatte of colors from larger color spaces.
+    /// Index `Image`s only make sense with 2 or more oclors, and will `throw` nonsense values
+    /// - Parameter numberOfColors: maximum number of colors
+    /// - Parameter shouldDither: true will apply GD’s internal dithering algorithm
+    public func reduceColors(max numberOfColors: Int, shouldDither: Bool = true) throws {
+        guard numberOfColors > 1 else {
+            throw Error.invalidMaxColors(reason: "Indexed images must have at least 2 colors")
+        }
+        let shouldDither: Int32 = shouldDither ? 1 : 0
+        gdImageTrueColorToPalette(internalImage, shouldDither, Int32(numberOfColors))
+    }
 
     deinit {
         // always destroy our internal image resource
