@@ -91,7 +91,7 @@ public class Image {
     /// The text will be rendered from the specified basepoint:
     ///
     ///     let basepoint = Point(x: 20, y: 200)
-    ///     image.stringTTF(
+    ///     image.stringFT(
     ///         from: basepoint,
     ///         fontList: "SFCompact",
     ///         color: .red,
