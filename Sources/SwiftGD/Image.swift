@@ -86,6 +86,53 @@ public class Image {
         }
     }
 
+    /// Renders an UTF-8 string onto the image.
+    ///
+    /// The text will be rendered from the specified basepoint:
+    ///
+    ///     let basepoint = Point(x: 20, y: 200)
+    ///     image.stringTTF(
+    ///         from: basepoint,
+    ///         fontList: "SFCompact",
+    ///         color: .red,
+    ///         pointSize: 100,
+    ///         text: "SwiftGD"
+    ///     )
+    ///
+    /// - Parameters:
+    ///   - from: The basepoint (roughly the lower left corner) of the first letter.
+    ///   - boundingRect: The bounding rectangle.
+    ///   - fontList: The semicolon delimited list of font filenames to look for.
+    ///   - color: The font color.
+    ///   - pointSize: The height of the font in typographical points (pt).
+    ///   - angle: The angle in radian to rotate the font counter-clockwise.
+    ///   - text: The string to render.
+    /// - Returns: The string bounding box. You can use this array to render the
+    ///   text off-image first, and then draw it again, on the image, with the
+    ///   bounding box image information (e.g., to center align the text).
+    ///   The points are returned in the following order: lower left, lower
+    ///   right, upper right, and upper left corner.
+    @discardableResult
+    public func stringFT(from: Point, fontList: String, color: Color, pointSize: Double, angle: Double = 0.0, text: String) -> [Point] {
+        let red = Int32(color.redComponent * 255.0)
+        let green = Int32(color.greenComponent * 255.0)
+        let blue = Int32(color.blueComponent * 255.0)
+        let alpha = 127 - Int32(color.alphaComponent * 127.0)
+        let internalColor = gdImageColorAllocateAlpha(internalImage, red, green, blue, alpha)
+
+        // `gdImageStringFT` returns the text bounding box, specified as four
+        // points in the following order:
+        // lower left, lower right, upper right, and upper left corner.
+        var boundingBox: [Int32] = .init(repeating: .zero, count: 8)
+        gdImageStringFT(internalImage, &boundingBox, internalColor, fontList, pointSize, angle, Int32(from.x), Int32(from.y), text)
+
+        let lowerLeft = Point(x: boundingBox[0], y: boundingBox[1])
+        let lowerRight = Point(x: boundingBox[2], y: boundingBox[3])
+        let upperRight = Point(x: boundingBox[4], y: boundingBox[5])
+        let upperLeft = Point(x: boundingBox[6], y: boundingBox[7])
+        return [lowerLeft, lowerRight, upperRight, upperLeft]
+    }
+
     public func fill(from: Point, color: Color) {
         let red = Int32(color.redComponent * 255.0)
         let green = Int32(color.greenComponent * 255.0)
