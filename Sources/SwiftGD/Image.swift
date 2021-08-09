@@ -207,8 +207,8 @@ public class Image {
         gdImageGrayScale(internalImage)
     }
     
-    /// Reduces `Image` to an indexed palatte of colors from larger color spaces.
-    /// Index `Image`s only make sense with 2 or more oclors, and will `throw` nonsense values
+    /// Reduces `Image` to an indexed palette of colors from larger color spaces.
+    /// Index `Image`s only make sense with 2 or more colors, and will `throw` nonsense values
     /// - Parameter numberOfColors: maximum number of colors
     /// - Parameter shouldDither: true will apply GD’s internal dithering algorithm
     public func reduceColors(max numberOfColors: Int, shouldDither: Bool = true) throws {
