@@ -119,6 +119,7 @@ public class Image {
         let blue = Int32(color.blueComponent * 255.0)
         let alpha = 127 - Int32(color.alphaComponent * 127.0)
         let internalColor = gdImageColorAllocateAlpha(internalImage, red, green, blue, alpha)
+        defer { gdImageColorDeallocate(internalImage, internalColor) }
 
         // `gdImageStringFT` returns the text bounding box, specified as four
         // points in the following order:
