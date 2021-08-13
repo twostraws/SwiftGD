@@ -209,7 +209,7 @@ extension Angle {
     /// - Parameter radians: The radians of the angle.
     /// - Returns: A new `Angle` instance with the specified radians.
     public static func radians(_ radians: Double) -> Angle {
-        Angle(radians: radians)
+        return Angle(radians: radians)
     }
 
     /// An angle.
@@ -217,6 +217,6 @@ extension Angle {
     /// - Parameter degrees: The degrees of the angle.
     /// - Returns: A new `Angle` instance with the specified degrees.
     public static func degrees(_ degrees: Double) -> Angle {
-        Angle(degrees: degrees)
+        return Angle(degrees: degrees)
     }
 }
