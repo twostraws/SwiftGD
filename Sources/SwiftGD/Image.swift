@@ -106,7 +106,8 @@ public class Image {
     ///     will be used.
     ///   - color: The font color.
     ///   - size: The height of the font in typographical points (pt).
-    ///   - angle: The angle to rotate the font counter-clockwise.
+    ///   - angle: The angle to rotate the rendered string counter-clockwise,
+    ///     from the basepoint.
     ///   - string: The string to render.
     /// - Returns: The string bounding box. You can use this array to render the
     ///   text off-image first, and then draw it again, on the image, with the
