@@ -101,7 +101,6 @@ public class Image {
     ///
     /// - Parameters:
     ///   - from: The basepoint (roughly the lower left corner) of the first letter.
-    ///   - boundingRect: The bounding rectangle.
     ///   - fontList: The semicolon delimited list of font filenames to look for.
     ///   - color: The font color.
     ///   - pointSize: The height of the font in typographical points (pt).
