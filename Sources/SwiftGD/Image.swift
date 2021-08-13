@@ -101,6 +101,7 @@ public class Image {
     ///     )
     ///
     /// - Parameters:
+    ///   - text: The string to render.
     ///   - from: The basepoint (roughly the lower left corner) of the first
     ///     letter.
     ///   - fontList: A list of font filenames to look for. The first match
@@ -109,14 +110,14 @@ public class Image {
     ///   - size: The height of the font in typographical points (pt).
     ///   - angle: The angle to rotate the rendered text from the basepoint
     ///     perspective. Positive angles rotate counter-clockwise.
-    ///   - string: The string to render.
-    /// - Returns: The string bounding box. You can use this array to render the
-    ///   text off-image first, and then draw it again, on the image, with the
-    ///   bounding box image information (e.g., to center align the text).
-    ///   The points are returned in the following order: lower left, lower
-    ///   right, upper right, and upper left corner.
+    /// - Returns: The rendered text bounding box. You can use this output to
+    ///   render the text off-image first, and then render it again, on the
+    ///   image, with the bounding box information (e.g., to center-align the
+    ///   text).
     @discardableResult
-    public func renderText(_ text: String, from: Point, fontList: [String], color: Color, size: Double, angle: Angle = .zero) -> [Point] {
+    public func renderText(
+        _ text: String, from: Point, fontList: [String], color: Color, size: Double, angle: Angle = .zero
+    ) -> (lowerLeft: Point, lowerRight: Point, upperRight: Point, upperLeft: Point) {
         let red = Int32(color.redComponent * 255.0)
         let green = Int32(color.greenComponent * 255.0)
         let blue = Int32(color.blueComponent * 255.0)
@@ -126,6 +127,7 @@ public class Image {
 
         // `gdImageStringFT` accepts a semicolon delimited list of fonts.
         let fontList = fontList.joined(separator: ";")
+
         // `gdImageStringFT` returns the text bounding box, specified as four
         // points in the following order:
         // lower left, lower right, upper right, and upper left corner.
@@ -136,7 +138,7 @@ public class Image {
         let lowerRight = Point(x: boundingBox[2], y: boundingBox[3])
         let upperRight = Point(x: boundingBox[4], y: boundingBox[5])
         let upperLeft = Point(x: boundingBox[6], y: boundingBox[7])
-        return [lowerLeft, lowerRight, upperRight, upperLeft]
+        return (lowerLeft, lowerRight, upperRight, upperLeft)
     }
 
     public func fill(from: Point, color: Color) {
