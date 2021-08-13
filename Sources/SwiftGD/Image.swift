@@ -91,12 +91,13 @@ public class Image {
     /// The text will be rendered from the specified basepoint:
     ///
     ///     let basepoint = Point(x: 20, y: 200)
-    ///     image.stringFT(
+    ///     image.renderText(
+    ///         "SwiftGD",
     ///         from: basepoint,
     ///         fontList: ["SFCompact"],
     ///         color: .red,
     ///         size: 100,
-    ///         string: "SwiftGD"
+    ///         angle: .degrees(90)
     ///     )
     ///
     /// - Parameters:
@@ -106,8 +107,8 @@ public class Image {
     ///     will be used.
     ///   - color: The font color.
     ///   - size: The height of the font in typographical points (pt).
-    ///   - angle: The angle to rotate the rendered string counter-clockwise,
-    ///     from the basepoint.
+    ///   - angle: The angle to rotate the rendered text from the basepoint
+    ///     perspective. Positive angles rotate counter-clockwise.
     ///   - string: The string to render.
     /// - Returns: The string bounding box. You can use this array to render the
     ///   text off-image first, and then draw it again, on the image, with the
@@ -115,7 +116,7 @@ public class Image {
     ///   The points are returned in the following order: lower left, lower
     ///   right, upper right, and upper left corner.
     @discardableResult
-    public func stringFT(from: Point, fontList: [String], color: Color, size: Double, angle: Angle = .zero, string: String) -> [Point] {
+    public func renderText(_ text: String, from: Point, fontList: [String], color: Color, size: Double, angle: Angle = .zero) -> [Point] {
         let red = Int32(color.redComponent * 255.0)
         let green = Int32(color.greenComponent * 255.0)
         let blue = Int32(color.blueComponent * 255.0)
@@ -129,7 +130,7 @@ public class Image {
         // points in the following order:
         // lower left, lower right, upper right, and upper left corner.
         var boundingBox: [Int32] = .init(repeating: .zero, count: 8)
-        gdImageStringFT(internalImage, &boundingBox, internalColor, fontList, size, angle.radians, Int32(from.x), Int32(from.y), string)
+        gdImageStringFT(internalImage, &boundingBox, internalColor, fontList, size, angle.radians, Int32(from.x), Int32(from.y), text)
 
         let lowerLeft = Point(x: boundingBox[0], y: boundingBox[1])
         let lowerRight = Point(x: boundingBox[2], y: boundingBox[3])
