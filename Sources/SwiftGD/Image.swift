@@ -93,15 +93,17 @@ public class Image {
     ///     let basepoint = Point(x: 20, y: 200)
     ///     image.stringFT(
     ///         from: basepoint,
-    ///         fontList: "SFCompact",
+    ///         fontList: ["SFCompact"],
     ///         color: .red,
     ///         pointSize: 100,
     ///         string: "SwiftGD"
     ///     )
     ///
     /// - Parameters:
-    ///   - from: The basepoint (roughly the lower left corner) of the first letter.
-    ///   - fontList: The semicolon delimited list of font filenames to look for.
+    ///   - from: The basepoint (roughly the lower left corner) of the first
+    ///     letter.
+    ///   - fontList: A list of font filenames to look for. The first match
+    ///     will be used.
     ///   - color: The font color.
     ///   - pointSize: The height of the font in typographical points (pt).
     ///   - angle: The angle in radian to rotate the font counter-clockwise.
@@ -112,7 +114,7 @@ public class Image {
     ///   The points are returned in the following order: lower left, lower
     ///   right, upper right, and upper left corner.
     @discardableResult
-    public func stringFT(from: Point, fontList: String, color: Color, pointSize: Double, angle: Double = 0.0, string: String) -> [Point] {
+    public func stringFT(from: Point, fontList: [String], color: Color, pointSize: Double, angle: Double = 0.0, string: String) -> [Point] {
         let red = Int32(color.redComponent * 255.0)
         let green = Int32(color.greenComponent * 255.0)
         let blue = Int32(color.blueComponent * 255.0)
@@ -120,6 +122,8 @@ public class Image {
         let internalColor = gdImageColorAllocateAlpha(internalImage, red, green, blue, alpha)
         defer { gdImageColorDeallocate(internalImage, internalColor) }
 
+        // `gdImageStringFT` accepts a semicolon delimited list of fonts.
+        let fontList = fontList.joined(separator: ";")
         // `gdImageStringFT` returns the text bounding box, specified as four
         // points in the following order:
         // lower left, lower right, upper right, and upper left corner.
