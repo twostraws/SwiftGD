@@ -95,7 +95,7 @@ public class Image {
     ///         from: basepoint,
     ///         fontList: ["SFCompact"],
     ///         color: .red,
-    ///         pointSize: 100,
+    ///         size: 100,
     ///         string: "SwiftGD"
     ///     )
     ///
@@ -105,7 +105,7 @@ public class Image {
     ///   - fontList: A list of font filenames to look for. The first match
     ///     will be used.
     ///   - color: The font color.
-    ///   - pointSize: The height of the font in typographical points (pt).
+    ///   - size: The height of the font in typographical points (pt).
     ///   - angle: The angle in radian to rotate the font counter-clockwise.
     ///   - string: The string to render.
     /// - Returns: The string bounding box. You can use this array to render the
@@ -114,7 +114,7 @@ public class Image {
     ///   The points are returned in the following order: lower left, lower
     ///   right, upper right, and upper left corner.
     @discardableResult
-    public func stringFT(from: Point, fontList: [String], color: Color, pointSize: Double, angle: Double = 0.0, string: String) -> [Point] {
+    public func stringFT(from: Point, fontList: [String], color: Color, size: Double, angle: Double = 0.0, string: String) -> [Point] {
         let red = Int32(color.redComponent * 255.0)
         let green = Int32(color.greenComponent * 255.0)
         let blue = Int32(color.blueComponent * 255.0)
@@ -128,7 +128,7 @@ public class Image {
         // points in the following order:
         // lower left, lower right, upper right, and upper left corner.
         var boundingBox: [Int32] = .init(repeating: .zero, count: 8)
-        gdImageStringFT(internalImage, &boundingBox, internalColor, fontList, pointSize, angle, Int32(from.x), Int32(from.y), string)
+        gdImageStringFT(internalImage, &boundingBox, internalColor, fontList, size, angle, Int32(from.x), Int32(from.y), string)
 
         let lowerLeft = Point(x: boundingBox[0], y: boundingBox[1])
         let lowerRight = Point(x: boundingBox[2], y: boundingBox[3])
