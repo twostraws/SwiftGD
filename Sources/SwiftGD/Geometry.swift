@@ -1,5 +1,3 @@
-import Foundation
-
 // MARK: - Point
 
 /// A structure that contains a point in a two-dimensional coordinate system.

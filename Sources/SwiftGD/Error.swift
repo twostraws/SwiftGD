@@ -1,5 +1,3 @@
-import Foundation
-
 /// Represents errors that can be thrown within the SwiftGD module.
 ///
 /// - invalidFormat: Image raster format mismatch on import/export
