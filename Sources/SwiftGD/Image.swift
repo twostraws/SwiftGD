@@ -86,6 +86,61 @@ public class Image {
         }
     }
 
+    /// Renders an UTF-8 string onto the image.
+    ///
+    /// The text will be rendered from the specified basepoint:
+    ///
+    ///     let basepoint = Point(x: 20, y: 200)
+    ///     image.renderText(
+    ///         "SwiftGD",
+    ///         from: basepoint,
+    ///         fontList: ["SFCompact"],
+    ///         color: .red,
+    ///         size: 100,
+    ///         angle: .degrees(90)
+    ///     )
+    ///
+    /// - Parameters:
+    ///   - text: The string to render.
+    ///   - from: The basepoint (roughly the lower left corner) of the first
+    ///     letter.
+    ///   - fontList: A list of font filenames to look for. The first match
+    ///     will be used.
+    ///   - color: The font color.
+    ///   - size: The height of the font in typographical points (pt).
+    ///   - angle: The angle to rotate the rendered text from the basepoint
+    ///     perspective. Positive angles rotate counter-clockwise.
+    /// - Returns: The rendered text bounding box. You can use this output to
+    ///   render the text off-image first, and then render it again, on the
+    ///   image, with the bounding box information (e.g., to center-align the
+    ///   text).
+    @discardableResult
+    public func renderText(
+        _ text: String, from: Point, fontList: [String], color: Color, size: Double, angle: Angle = .zero
+    ) -> (lowerLeft: Point, lowerRight: Point, upperRight: Point, upperLeft: Point) {
+        let red = Int32(color.redComponent * 255.0)
+        let green = Int32(color.greenComponent * 255.0)
+        let blue = Int32(color.blueComponent * 255.0)
+        let alpha = 127 - Int32(color.alphaComponent * 127.0)
+        let internalColor = gdImageColorAllocateAlpha(internalImage, red, green, blue, alpha)
+        defer { gdImageColorDeallocate(internalImage, internalColor) }
+
+        // `gdImageStringFT` accepts a semicolon delimited list of fonts.
+        let fontList = fontList.joined(separator: ";")
+
+        // `gdImageStringFT` returns the text bounding box, specified as four
+        // points in the following order:
+        // lower left, lower right, upper right, and upper left corner.
+        var boundingBox: [Int32] = .init(repeating: .zero, count: 8)
+        gdImageStringFT(internalImage, &boundingBox, internalColor, fontList, size, angle.radians, Int32(from.x), Int32(from.y), text)
+
+        let lowerLeft = Point(x: boundingBox[0], y: boundingBox[1])
+        let lowerRight = Point(x: boundingBox[2], y: boundingBox[3])
+        let upperRight = Point(x: boundingBox[4], y: boundingBox[5])
+        let upperLeft = Point(x: boundingBox[6], y: boundingBox[7])
+        return (lowerLeft, lowerRight, upperRight, upperLeft)
+    }
+
     public func fill(from: Point, color: Color) {
         let red = Int32(color.redComponent * 255.0)
         let green = Int32(color.greenComponent * 255.0)
@@ -206,9 +261,9 @@ public class Image {
     public func desaturate() {
         gdImageGrayScale(internalImage)
     }
-    
-    /// Reduces `Image` to an indexed palatte of colors from larger color spaces.
-    /// Index `Image`s only make sense with 2 or more oclors, and will `throw` nonsense values
+
+    /// Reduces `Image` to an indexed palette of colors from larger color spaces.
+    /// Index `Image`s only make sense with 2 or more colors, and will `throw` nonsense values
     /// - Parameter numberOfColors: maximum number of colors
     /// - Parameter shouldDither: true will apply GD’s internal dithering algorithm
     public func reduceColors(max numberOfColors: Int, shouldDither: Bool = true) throws {
