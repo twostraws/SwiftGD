@@ -109,7 +109,7 @@ public class Image {
     ///   - color: The font color.
     ///   - size: The height of the font in typographical points (pt).
     ///   - angle: The angle to rotate the rendered text from the basepoint
-    ///     perspective. Positive angles rotate counter-clockwise.
+    ///     perspective. Positive angles rotate clockwise.
     /// - Returns: The rendered text bounding box. You can use this output to
     ///   render the text off-image first, and then render it again, on the
     ///   image, with the bounding box information (e.g., to center-align the
@@ -132,7 +132,7 @@ public class Image {
         // points in the following order:
         // lower left, lower right, upper right, and upper left corner.
         var boundingBox: [Int32] = .init(repeating: .zero, count: 8)
-        gdImageStringFT(internalImage, &boundingBox, internalColor, fontList, size, angle.radians, Int32(from.x), Int32(from.y), text)
+        gdImageStringFT(internalImage, &boundingBox, internalColor, fontList, size, -angle.radians, Int32(from.x), Int32(from.y), text)
 
         let lowerLeft = Point(x: boundingBox[0], y: boundingBox[1])
         let lowerRight = Point(x: boundingBox[2], y: boundingBox[3])
