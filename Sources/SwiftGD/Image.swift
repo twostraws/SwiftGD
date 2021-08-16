@@ -117,7 +117,7 @@ public class Image {
     @discardableResult
     public func renderText(
         _ text: String, from: Point, fontList: [String], color: Color, size: Double, angle: Angle = .zero
-    ) -> (lowerLeft: Point, lowerRight: Point, upperRight: Point, upperLeft: Point) {
+    ) -> (upperLeft: Point, upperRight: Point, lowerRight: Point, lowerLeft: Point) {
         let red = Int32(color.redComponent * 255.0)
         let green = Int32(color.greenComponent * 255.0)
         let blue = Int32(color.blueComponent * 255.0)
@@ -138,7 +138,7 @@ public class Image {
         let lowerRight = Point(x: boundingBox[2], y: boundingBox[3])
         let upperRight = Point(x: boundingBox[4], y: boundingBox[5])
         let upperLeft = Point(x: boundingBox[6], y: boundingBox[7])
-        return (lowerLeft, lowerRight, upperRight, upperLeft)
+        return (upperLeft, upperRight, lowerRight, lowerLeft)
     }
 
     public func fill(from: Point, color: Color) {
