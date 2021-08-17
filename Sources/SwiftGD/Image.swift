@@ -118,6 +118,16 @@ public class Image {
     public func renderText(
         _ text: String, from: Point, fontList: [String], color: Color, size: Double, angle: Angle = .zero
     ) -> (upperLeft: Point, upperRight: Point, lowerRight: Point, lowerLeft: Point) {
+        /// Notes on `gdImageStringFT`:
+        /// - it returns an Tuple of empty `Point`s if there is nothing to render or no valid fonts
+        /// - `gdImageStringFT` accepts a semicolon delimited list of fonts.
+        /// - `gdImageStringFT` expects pointers to `text` and `fontList` values
+        guard !text.isEmpty,
+              !fontList.isEmpty,
+              var fontList = CChar(fontList.joined(separator: ";")),
+              var text = CChar(text) else {
+                  return (upperLeft: .zero, upperRight: .zero, lowerRight: .zero, lowerLeft: .zero)
+        }
         let red = Int32(color.redComponent * 255.0)
         let green = Int32(color.greenComponent * 255.0)
         let blue = Int32(color.blueComponent * 255.0)
@@ -125,14 +135,11 @@ public class Image {
         let internalColor = gdImageColorAllocateAlpha(internalImage, red, green, blue, alpha)
         defer { gdImageColorDeallocate(internalImage, internalColor) }
 
-        // `gdImageStringFT` accepts a semicolon delimited list of fonts.
-        let fontList = fontList.joined(separator: ";")
-
         // `gdImageStringFT` returns the text bounding box, specified as four
         // points in the following order:
-        // lower left, lower right, upper right, and upper left corner.
+        // upper left, upper right, lower right, and lower left corner.
         var boundingBox: [Int32] = .init(repeating: .zero, count: 8)
-        gdImageStringFT(internalImage, &boundingBox, internalColor, fontList, size, -angle.radians, Int32(from.x), Int32(from.y), text)
+        gdImageStringFT(internalImage, &boundingBox, internalColor, &fontList, size, -angle.radians, Int32(from.x), Int32(from.y), &text)
 
         let lowerLeft = Point(x: boundingBox[0], y: boundingBox[1])
         let lowerRight = Point(x: boundingBox[2], y: boundingBox[3])
