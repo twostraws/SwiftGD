@@ -123,11 +123,11 @@ public class Image {
         /// - `gdImageStringFT` accepts a semicolon delimited list of fonts.
         /// - `gdImageStringFT` expects pointers to `text` and `fontList` values
         guard !text.isEmpty,
-              !fontList.isEmpty else {
+              !fontList.isEmpty,
+              var textCChar = text.cString(using: .utf8),
+              var joinedFonts = fontList.joined(separator: ";").cString(using: .utf8) else {
                   return (upperLeft: .zero, upperRight: .zero, lowerRight: .zero, lowerLeft: .zero)
         }
-        var textCChar = text.cString(using: .utf8)
-        var joinedFonts = fontList.joined(separator: ";").cString(using: .utf8)
         let red = Int32(color.redComponent * 255.0)
         let green = Int32(color.greenComponent * 255.0)
         let blue = Int32(color.blueComponent * 255.0)
@@ -139,7 +139,7 @@ public class Image {
         // points in the following order:
         // upper left, upper right, lower right, and lower left corner.
         var boundingBox: [Int32] = .init(repeating: .zero, count: 8)
-        gdImageStringFT(internalImage, &boundingBox, internalColor, &joinedFonts!, size, -angle.radians, Int32(from.x), Int32(from.y), &textCChar!)
+        gdImageStringFT(internalImage, &boundingBox, internalColor, &joinedFonts, size, -angle.radians, Int32(from.x), Int32(from.y), &textCChar)
 
         let lowerLeft = Point(x: boundingBox[0], y: boundingBox[1])
         let lowerRight = Point(x: boundingBox[2], y: boundingBox[3])
