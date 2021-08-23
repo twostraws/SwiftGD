@@ -137,7 +137,7 @@ public class Image {
 
         // `gdImageStringFT` returns the text bounding box, specified as four
         // points in the following order:
-        // upper left, upper right, lower right, and lower left corner.
+        // lower left, lower right, upper right, and upper left corner.
         var boundingBox: [Int32] = .init(repeating: .zero, count: 8)
         gdImageStringFT(internalImage, &boundingBox, internalColor, &joinedFonts, size, -angle.radians, Int32(from.x), Int32(from.y), &textCChar)
 
