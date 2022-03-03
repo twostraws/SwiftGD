@@ -245,6 +245,10 @@ public class Image {
             gdImageFlipBoth(internalImage)
         }
     }
+    
+    public func rotate(_ angle: Angle) {
+        gdImageRotateInterpolated(internalImage, Float(angle.radians), 0)
+    }
 
     public func pixelate(blockSize: Int) {
         gdImagePixelate(internalImage, Int32(blockSize), GD_PIXELATE_AVERAGE.rawValue)
