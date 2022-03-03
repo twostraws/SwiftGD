@@ -76,6 +76,20 @@ public class Image {
         return Image(gdImage: output)
     }
 
+
+    public func flipped(_ mode: FlipMode) -> Image? {
+        guard let output = gdImageClone(internalImage) else { return nil }
+        switch mode {
+        case .horizontal:
+            gdImageFlipHorizontal(output)
+        case .vertical:
+            gdImageFlipVertical(output)
+        case .both:
+            gdImageFlipBoth(output)
+        }
+        return Image(gdImage: output)
+    }
+
     public func applyInterpolation(enabled: Bool, currentSize: Size, newSize: Size) {
         guard enabled else {
             gdImageSetInterpolationMethod(internalImage, GD_NEAREST_NEIGHBOUR)
