@@ -77,7 +77,7 @@ public class Image {
     }
 
     public func rotated(_ angle: Angle) -> Image? {
-        guard let output = gdImageRotateInterpolated(internalImage, Float(angle.radians), 0) else { return nil }
+        guard let output = gdImageRotateInterpolated(internalImage, Float(angle.degrees), 0) else { return nil }
         return Image(gdImage: output)
     }
 
