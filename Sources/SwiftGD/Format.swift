@@ -211,12 +211,25 @@ private struct WBMPFormatter: LibGdParametrizableFormatter {
 }
 
 /// Defines a formatter to be used on WEBP import & export conversions
-private struct WEBPFormatter: LibGdFormatter {
+private struct WEBPFormatter: LibGdParametrizableFormatter {
+    /// The parameters to apply on exports
+    fileprivate let exportParameters: Int32
+
+    /// Initializes a new instance of `Self` using given quality on exports
+    /// For practical purposes, the quality should be a value in the range `0...95`. For values less than or equal `0` or
+    /// lower, a reasonable quality value (which should yield a good general quality / size tradeoff for most situations) is used.
+    ///
+    /// - Parameter quality:
+    ///     Compression quality to apply on exports. Defaults to -1.
+    ///     See [Reference](https://libgd.github.io/manuals/2.2.5/files/gd_webp-c.html)
+    init(quality: Int32 = -1) {
+        exportParameters = quality
+    }
     /// Function pointer to libgd's built-in webp image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromWebpPtr
 
     /// Function pointer to libgd's built-in webp image export function
-    fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageWebpPtr
+    fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>, Int32) -> UnsafeMutableRawPointer? = gdImageWebpPtrEx
 }
 
 // MARK: - Convenience LibGd Format
@@ -283,7 +296,7 @@ public enum ExportableFormat: ExportableFormatter {
     case png
     case tiff
     case wbmp(index: Int32)
-    case webp
+    case webp(quality: Int32)
 
     /// Creates a data representation of given `gdImagePtr`.
     ///
@@ -297,12 +310,12 @@ public enum ExportableFormat: ExportableFormatter {
         case let .bmp(compression): return try BMPFormatter(compression: compression).data(of: imagePtr)
         case let .jpg(quality): return try JPGFormatter(quality: quality).data(of: imagePtr)
         case let .wbmp(index): return try WBMPFormatter(index: index).data(of: imagePtr)
+        case let .webp(quality): return try WEBPFormatter(quality: quality).data(of: imagePtr)
 
         // None parametrizable image raster format
         case .gif: return try GIFFormatter().data(of: imagePtr)
         case .png: return try PNGFormatter().data(of: imagePtr)
         case .tiff: return try TIFFFormatter().data(of: imagePtr)
-        case .webp: return try WEBPFormatter().data(of: imagePtr)
         }
     }
 }
