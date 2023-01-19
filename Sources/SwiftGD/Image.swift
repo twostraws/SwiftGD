@@ -34,6 +34,11 @@ public class Image {
     private init(gdImage: gdImagePtr) {
         self.internalImage = gdImage
     }
+    
+    public func cloned() -> Image? {
+        guard let output = gdImageClone(internalImage) else { return nil }
+        return Image(gdImage: output)
+    }
 
     public func resizedTo(width: Int, height: Int, applySmoothing: Bool = true) -> Image? {
         applyInterpolation(enabled: applySmoothing, currentSize: size, newSize: Size(width: width, height: height))
@@ -63,11 +68,29 @@ public class Image {
         guard let output = gdImageScale(internalImage, UInt32(newSize.width), UInt32(height)) else { return nil }
         return Image(gdImage: output)
     }
-
+    
     public func cropped(to rect: Rectangle) -> Image? {
         var rect = gdRect(x: Int32(rect.point.x), y: Int32(rect.point.y), width: Int32(rect.size.width), height: Int32(rect.size.height))
 
         guard let output = gdImageCrop(internalImage, &rect) else { return nil }
+        return Image(gdImage: output)
+    }
+
+    public func rotated(_ angle: Angle) -> Image? {
+        guard let output = gdImageRotateInterpolated(internalImage, Float(angle.degrees), 0) else { return nil }
+        return Image(gdImage: output)
+    }
+
+    public func flipped(_ mode: FlipMode) -> Image? {
+        guard let output = gdImageClone(internalImage) else { return nil }
+        switch mode {
+        case .horizontal:
+            gdImageFlipHorizontal(output)
+        case .vertical:
+            gdImageFlipVertical(output)
+        case .both:
+            gdImageFlipBoth(output)
+        }
         return Image(gdImage: output)
     }
 
