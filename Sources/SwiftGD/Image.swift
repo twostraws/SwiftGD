@@ -193,6 +193,15 @@ public class Image {
         gdImageLine(internalImage, Int32(from.x), Int32(from.y), Int32(to.x), Int32(to.y), internalColor)
     }
 
+    public func drawImage(_ image:Image, at topLeft: Point = .zero) {
+        let width = Int32(self.size.width - topLeft.x)
+        let height = Int32(self.size.height - topLeft.y)
+        let dst_x = Int32(topLeft.x)
+        let dst_y = Int32(topLeft.y)
+
+        gdImageCopy(internalImage, image.internalImage, dst_x, dst_y, 0, 0, width, height)
+    }
+
     public func set(pixel: Point, to color: Color) {
         let red = Int32(color.redComponent * 255.0)
         let green = Int32(color.greenComponent * 255.0)
