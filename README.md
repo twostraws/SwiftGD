@@ -104,12 +104,13 @@ To crop an image, call its `cropped(to:)` method, passing in the `Rectangle` tha
 
 
 
-## Drawing shapes and colors
+## Drawing shapes, colors and images
 
 There are eight methods you can use to draw into your images:
 
 - `fill(from:color:)` performs a flood fill from a `Point` on your image using the `Color` you specify.
 - `drawLine(from:to:color:)` draws a line between the `to` and `from` parameters (both instances of `Point`) in the `Color` you specify.
+- `drawImage(_:at:)` draws an `Image` at the specified `Point` (or just top left if `at` is omitted).
 - `set(pixel:to:)` sets a pixel at a specific `Point` to the `Color` you specify.
 - `get(pixel:)` returns the `Color` value of a pixel at a specific `Point`.
 - `strokeEllipse(center:size:color:)` draws an empty ellipse at the center `Point`, with the `Size` and `Color` you specify.
