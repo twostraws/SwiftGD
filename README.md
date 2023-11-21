@@ -11,6 +11,7 @@ SwiftGD wraps GD inside classes to make it easier to use, and provides the follo
 - Cropping at a location and size.
 - Flood filling a color from a coordinate.
 - Drawing lines
+- Drawing images
 - Reading and writing individual pixels.
 - Stroking and filling ellipses and rectangles.
 - Flipping images horizontally and vertically.
@@ -106,7 +107,7 @@ To crop an image, call its `cropped(to:)` method, passing in the `Rectangle` tha
 
 ## Drawing shapes, colors and images
 
-There are eight methods you can use to draw into your images:
+There are nine methods you can use to draw into your images:
 
 - `fill(from:color:)` performs a flood fill from a `Point` on your image using the `Color` you specify.
 - `drawLine(from:to:color:)` draws a line between the `to` and `from` parameters (both instances of `Point`) in the `Color` you specify.
