@@ -219,6 +219,15 @@ private struct WEBPFormatter: LibGdFormatter {
     fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageWebpPtr
 }
 
+/// Defines a formatter to be used on AVIF import & export conversions
+private struct AVIFFormatter: LibGdFormatter {
+     /// Function pointer to libgd's built-in avif image create function
+     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromAvifPtr
+
+     /// Function pointer to libgd's built-in avif image export function
+     fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageAvifPtr
+ }
+
 // MARK: - Convenience LibGd Format
 
 /// Enum definition of built-in importable image raster formats
@@ -241,6 +250,7 @@ public enum ImportableFormat: ImportableFormatter {
     case tga
     case wbmp
     case webp
+    case avif
     case any // Wildcard, will evaluate all of the above defined cases
 
     /// Creates a `gdImagePtr` from given image data.
@@ -258,6 +268,7 @@ public enum ImportableFormat: ImportableFormatter {
         case .tga: return try TGAFormatter().imagePtr(of: data)
         case .wbmp: return try WBMPFormatter(index: -1).imagePtr(of: data)
         case .webp: return try WEBPFormatter().imagePtr(of: data)
+        case .avif: return try AVIFFormatter().imagePtr(of: data)
         case .any:
             return try ([
                 .jpg, .png, .gif, .webp, .tiff, .bmp, .wbmp
@@ -275,6 +286,7 @@ public enum ImportableFormat: ImportableFormatter {
 /// - tiff: https://en.wikipedia.org/wiki/tiff
 /// - wbmp: https://en.wikipedia.org/wiki/wbmp
 /// - webp: https://en.wikipedia.org/wiki/webp
+/// - avif: https://en.wikipedia.org/wiki/AVIF
 /// - any: Evaluates all of the above mentioned formats on export
 public enum ExportableFormat: ExportableFormatter {
     case bmp(compression: Bool)
@@ -284,7 +296,8 @@ public enum ExportableFormat: ExportableFormatter {
     case tiff
     case wbmp(index: Int32)
     case webp
-
+    case avif
+    
     /// Creates a data representation of given `gdImagePtr`.
     ///
     /// - Parameter imagePtr: The `gdImagePtr` of which a data representation should be instantiated.
@@ -303,6 +316,7 @@ public enum ExportableFormat: ExportableFormatter {
         case .png: return try PNGFormatter().data(of: imagePtr)
         case .tiff: return try TIFFFormatter().data(of: imagePtr)
         case .webp: return try WEBPFormatter().data(of: imagePtr)
+        case .avif: return try AVIFFormatter().data(of: imagePtr)
         }
     }
 }

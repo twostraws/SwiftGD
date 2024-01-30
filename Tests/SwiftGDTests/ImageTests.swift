@@ -51,6 +51,32 @@ class TestImage: XCTestCase {
 
         XCTAssertTrue(try isEmptyBounds(for: renderBounds), "Empty fontLists return tuple of zero-value Points")
     }
+    
+    func testCreateAndExportAVIFImage() throws {
+        guard let image = Image(width: 640, height: 480) else {
+            throw Error.invalidImage(reason: "Could not initialize image")
+        }
+        
+        // Perform some operations on the image, e.g., render text
+        image.renderText(
+            "SwiftGD AVIF Test",
+            from: Point(x: 320, y: 240),
+            fontList: Self.fontList,
+            color: .red,
+            size: 50,
+            angle: .degrees(0)
+        )
+        
+        // Export the image to AVIF format
+        guard let avifData = try? image.export(as: .avif) else {
+            XCTFail("Failed to export image to AVIF format")
+            return
+        }
+        
+        // Check if the exported data is not nil and has reasonable size
+        XCTAssertNotNil(avifData, "Exported AVIF data should not be nil")
+        XCTAssertFalse(avifData.isEmpty, "Exported AVIF data should not be empty")
+    }
 }
 
 extension TestImage {
