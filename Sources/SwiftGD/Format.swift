@@ -1,7 +1,7 @@
 #if os(Linux)
-import Glibc
+    import Glibc
 #else
-import Darwin
+    import Darwin
 #endif
 
 import Foundation
@@ -50,7 +50,7 @@ private protocol LibGdExportableFormatter: ExportableFormatter {
 private protocol LibGdParametrizableExportFormatter: ExportableFormatter {
     /// The parameters to apply on exports
     var exportParameters: Int32 { get }
-    
+
     /// Function pointer to one of libgd's build in image export functions
     var exportFunction: (_ im: gdImagePtr, _ size: UnsafeMutablePointer<Int32>, _ parameters: Int32) -> UnsafeMutableRawPointer? { get }
 }
@@ -116,7 +116,7 @@ extension LibGdParametrizableExportFormatter {
 private struct BMPFormatter: LibGdParametrizableFormatter {
     /// The parameters to apply on exports
     fileprivate var exportParameters: Int32
-    
+
     /// Initializes a new instance of `Self` using given RLE compression option on exports
     ///
     /// - Parameter compression:
@@ -125,10 +125,10 @@ private struct BMPFormatter: LibGdParametrizableFormatter {
     init(compression: Bool = false) {
         exportParameters = compression ? 1 : 0
     }
-    
+
     /// Function pointer to libgd's built-in bmp image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromBmpPtr
-    
+
     /// Function pointer to libgd's built-in bmp image export function
     fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>, Int32) -> UnsafeMutableRawPointer? = gdImageBmpPtr
 }
@@ -137,7 +137,7 @@ private struct BMPFormatter: LibGdParametrizableFormatter {
 private struct GIFFormatter: LibGdFormatter {
     /// Function pointer to libgd's built-in gif image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromGifPtr
-    
+
     /// Function pointer to libgd's built-in gif image export function
     fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageGifPtr
 }
@@ -146,7 +146,7 @@ private struct GIFFormatter: LibGdFormatter {
 private struct JPGFormatter: LibGdParametrizableFormatter {
     /// The parameters to apply on exports
     fileprivate let exportParameters: Int32
-    
+
     /// Initializes a new instance of `Self` using given quality on exports
     /// For practical purposes, the quality should be a value in the range `0...95`. For values less than or equal `0` or
     /// lower, the IJG JPEG quality value (which should yield a good general quality / size tradeoff for most situations) is used.
@@ -157,10 +157,10 @@ private struct JPGFormatter: LibGdParametrizableFormatter {
     init(quality: Int32 = -1) {
         exportParameters = quality
     }
-    
+
     /// Function pointer to libgd's built-in jpeg image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromJpegPtr
-    
+
     /// Function pointer to libgd's built-in jpeg image export function
     fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>, Int32) -> UnsafeMutableRawPointer? = gdImageJpegPtr
 }
@@ -169,7 +169,7 @@ private struct JPGFormatter: LibGdParametrizableFormatter {
 private struct PNGFormatter: LibGdFormatter {
     /// Function pointer to libgd's built-in png image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromPngPtr
-    
+
     /// Function pointer to libgd's built-in png image export function
     fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImagePngPtr
 }
@@ -178,7 +178,7 @@ private struct PNGFormatter: LibGdFormatter {
 private struct TIFFFormatter: LibGdFormatter {
     /// Function pointer to libgd's built-in tiff image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromTiffPtr
-    
+
     /// Function pointer to libgd's built-in tiff image export function
     fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageTiffPtr
 }
@@ -193,7 +193,7 @@ private struct TGAFormatter: LibGdImportableFormatter {
 private struct WBMPFormatter: LibGdParametrizableFormatter {
     /// The parameters to apply on exports
     fileprivate let exportParameters: Int32
-    
+
     /// Initializes a new instance of `Self` using index as foreground color on exports
     ///
     /// - Parameter index:
@@ -202,10 +202,10 @@ private struct WBMPFormatter: LibGdParametrizableFormatter {
     init(index: Int32) {
         exportParameters = index
     }
-    
+
     /// Function pointer to libgd's built-in wbmp image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromWBMPPtr
-    
+
     /// Function pointer to libgd's built-in wbmp image export function
     fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>, Int32) -> UnsafeMutableRawPointer? = gdImageWBMPPtr
 }
@@ -214,18 +214,19 @@ private struct WBMPFormatter: LibGdParametrizableFormatter {
 private struct WEBPFormatter: LibGdFormatter {
     /// Function pointer to libgd's built-in webp image create function
     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromWebpPtr
-    
+
     /// Function pointer to libgd's built-in webp image export function
     fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageWebpPtr
 }
 
+/// Defines a formatter to be used on AVIF import & export conversions
 private struct AVIFFormatter: LibGdFormatter {
-    /// Function pointer to libgd's built-in webp image create function
-    fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromAvifPtr
-    
-    /// Function pointer to libgd's built-in webp image export function
-    fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageAvifPtr
-}
+     /// Function pointer to libgd's built-in avif image create function
+     fileprivate let importFunction: (Int32, UnsafeMutableRawPointer) -> gdImagePtr? = gdImageCreateFromAvifPtr
+
+     /// Function pointer to libgd's built-in avif image export function
+     fileprivate let exportFunction: (gdImagePtr, UnsafeMutablePointer<Int32>) -> UnsafeMutableRawPointer? = gdImageAvifPtr
+ }
 
 // MARK: - Convenience LibGd Format
 
@@ -251,7 +252,7 @@ public enum ImportableFormat: ImportableFormatter {
     case webp
     case avif
     case any // Wildcard, will evaluate all of the above defined cases
-    
+
     /// Creates a `gdImagePtr` from given image data.
     ///
     /// - Parameter data: The image data of which an image should be instantiated.
@@ -271,7 +272,7 @@ public enum ImportableFormat: ImportableFormatter {
         case .any:
             return try ([
                 .jpg, .png, .gif, .webp, .tiff, .bmp, .wbmp
-            ] as [ImportableFormat]).imagePtr(of: data)
+                ] as [ImportableFormat]).imagePtr(of: data)
         }
     }
 }
@@ -285,6 +286,7 @@ public enum ImportableFormat: ImportableFormatter {
 /// - tiff: https://en.wikipedia.org/wiki/tiff
 /// - wbmp: https://en.wikipedia.org/wiki/wbmp
 /// - webp: https://en.wikipedia.org/wiki/webp
+/// - avif: https://en.wikipedia.org/wiki/AVIF
 /// - any: Evaluates all of the above mentioned formats on export
 public enum ExportableFormat: ExportableFormatter {
     case bmp(compression: Bool)
@@ -303,13 +305,13 @@ public enum ExportableFormat: ExportableFormatter {
     /// - Throws: `Error` if export failed.
     public func data(of imagePtr: gdImagePtr) throws -> Data {
         switch self {
-            
-            // Parametrizable image raster format
+
+        // Parametrizable image raster format
         case let .bmp(compression): return try BMPFormatter(compression: compression).data(of: imagePtr)
         case let .jpg(quality): return try JPGFormatter(quality: quality).data(of: imagePtr)
         case let .wbmp(index): return try WBMPFormatter(index: index).data(of: imagePtr)
-            
-            // None parametrizable image raster format
+
+        // None parametrizable image raster format
         case .gif: return try GIFFormatter().data(of: imagePtr)
         case .png: return try PNGFormatter().data(of: imagePtr)
         case .tiff: return try TIFFFormatter().data(of: imagePtr)
@@ -333,7 +335,7 @@ extension Data {
             guard let baseAddress = $0.baseAddress else {
                 throw Error.invalidImage(reason: "Given image data doesn't have a valid base address in memory.")
             }
-            
+
             return UnsafeMutableRawPointer(mutating: baseAddress)
         }, size: Int32(count))
     }
