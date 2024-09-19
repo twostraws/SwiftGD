@@ -323,23 +323,27 @@ public class Image {
 
 extension Image {
     public convenience init?(url: URL) {
-        let inputFile = fopen(url.path, "rb")
-        defer { fclose(inputFile) }
-
-        guard inputFile != nil else { return nil }
-
-        let loadedImage: gdImagePtr?
-
-        if url.lastPathComponent.lowercased().hasSuffix("jpg") || url.lastPathComponent.lowercased().hasSuffix("jpeg") {
-            loadedImage = gdImageCreateFromJpeg(inputFile)
-        } else if url.lastPathComponent.lowercased().hasSuffix("png") {
-            loadedImage = gdImageCreateFromPng(inputFile)
-        } else {
+        guard let inputFile = fopen(url.path, "rb") else {
             return nil
         }
 
-        guard let image = loadedImage else { return nil }
-        self.init(gdImage: image)
+        defer { fclose(inputFile) }
+
+        let ext = url.lastPathComponent.lowercased()
+
+        let loadedImage: gdImagePtr? = if ext.hasSuffix("jpg") || ext.hasSuffix("jpeg") {
+            gdImageCreateFromJpeg(inputFile)
+        } else if ext.hasSuffix("png") {
+            gdImageCreateFromPng(inputFile)
+        } else {
+            nil
+        }
+
+        if let image = loadedImage {
+            self.init(gdImage: image)
+        } else {
+            return nil
+        }
     }
 
     @discardableResult
@@ -355,7 +359,10 @@ extension Image {
         }
 
         // open our output file, then defer it to close
-        let outputFile = fopen(url.path, "wb")
+        guard let outputFile = fopen(url.path, "wb") else {
+            return false
+        }
+
         defer { fclose(outputFile) }
 
         // write the correct output format based on the path extension
