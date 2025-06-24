@@ -313,6 +313,17 @@ public class Image {
         gdImageTrueColorToPalette(internalImage, shouldDither, Int32(numberOfColors))
     }
 
+    /// Copies a rectangular region from a source image to this image at the specified destination.
+    ///
+    /// - Parameters:
+    ///   - src: The source image from which to copy pixels.
+    ///   - from: The top-left point in the source image defining the origin of the region to copy.
+    ///   - size: The width and height (in pixels) of the rectangular region to copy.
+    ///   - to: The top-left point in this image where the region will be placed.
+    public func insertImage(image src: Image, from :Point, size: Size, to: Point) {
+        gdImageCopy(internalImage, src.internalImage, Int32(to.x), Int32(to.y), Int32(from.x), Int32(from.y), Int32(size.width), Int32(size.height))
+    }
+
     deinit {
         // always destroy our internal image resource
         gdImageDestroy(internalImage)
