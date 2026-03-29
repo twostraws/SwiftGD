@@ -335,6 +335,8 @@ extension Image {
             gdImageCreateFromJpeg(inputFile)
         } else if ext.hasSuffix("png") {
             gdImageCreateFromPng(inputFile)
+        } else if ext.hasSuffix("webp") {
+            gdImageCreateFromWebp(inputFile)
         } else {
             nil
         }
@@ -349,7 +351,7 @@ extension Image {
     @discardableResult
     public func write(to url: URL, quality: Int = 100, allowOverwrite: Bool = false) -> Bool {
         let fileType = url.pathExtension.lowercased()
-        guard fileType == "png" || fileType == "jpeg" || fileType == "jpg" else { return false }
+        guard fileType == "png" || fileType == "jpeg" || fileType == "jpg" || fileType == "webp" else { return false }
 
         let fm = FileManager()
 
@@ -372,6 +374,8 @@ extension Image {
             gdImagePng(internalImage, outputFile)
         case "jpg", "jpeg":
             gdImageJpeg(internalImage, outputFile, Int32(quality))
+        case "webp":
+            gdImageWebp(internalImage, outputFile)
         default:
             return false
         }
