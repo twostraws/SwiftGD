@@ -313,13 +313,12 @@ public class Image {
         gdImageTrueColorToPalette(internalImage, shouldDither, Int32(numberOfColors))
     }
 
-    /// Extends the image color palette to truecolor.
+    /// Converts a palette-based image to a true-color image.
     /// It should be used when you're encountering color allocation failures with palette-based images or
     /// when you need to perform operations that require more than 256 colors.
     ///
-    /// - Note: The reverse option might cause a loss of color information
-    /// - SeeAlso: `reduceColors()` for the reverse operation (converting truecolor to palette-based).
-    public func extendColors() {
+    /// - SeeAlso: `reduceColors()` for the reverse operation (converting true color to palette-based).
+    public func extendToTrueColor() {
         gdImagePaletteToTrueColor(internalImage)
     }
 
