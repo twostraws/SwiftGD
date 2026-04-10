@@ -34,7 +34,7 @@ public class Image {
     private init(gdImage: gdImagePtr) {
         self.internalImage = gdImage
     }
-    
+
     public func cloned() -> Image? {
         guard let output = gdImageClone(internalImage) else { return nil }
         return Image(gdImage: output)
@@ -68,7 +68,7 @@ public class Image {
         guard let output = gdImageScale(internalImage, UInt32(newSize.width), UInt32(height)) else { return nil }
         return Image(gdImage: output)
     }
-    
+
     public func cropped(to rect: Rectangle) -> Image? {
         var rect = gdRect(x: Int32(rect.point.x), y: Int32(rect.point.y), width: Int32(rect.size.width), height: Int32(rect.size.height))
 
@@ -193,7 +193,7 @@ public class Image {
         gdImageLine(internalImage, Int32(from.x), Int32(from.y), Int32(to.x), Int32(to.y), internalColor)
     }
 
-    public func drawImage(_ image:Image, at topLeft: Point = .zero) {
+    public func drawImage(_ image: Image, at topLeft: Point = .zero) {
         let width = Int32(self.size.width - topLeft.x)
         let height = Int32(self.size.height - topLeft.y)
         let dst_x = Int32(topLeft.x)

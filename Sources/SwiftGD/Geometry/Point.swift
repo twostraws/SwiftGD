@@ -43,19 +43,19 @@ extension Point: Equatable, Hashable {
     public static func == (lhs: Point, rhs: Point) -> Bool {
         return lhs.x == rhs.x && lhs.y == rhs.y
     }
-    
+
     public static func + (lhs: SwiftGD.Point, rhs: SwiftGD.Point) -> Point {
         return Point(x: lhs.x + rhs.x, y: lhs.y + rhs.y)
     }
-        
+
     public static func - (lhs: SwiftGD.Point, rhs: SwiftGD.Point) -> Point {
         return Point(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
     }
-        
+
     public static func * (lhs: SwiftGD.Point, rhs: Int) -> Point {
         return Point(x: lhs.x * rhs, y: lhs.y * rhs)
     }
-        
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(x)
         hasher.combine(y)
