@@ -1,4 +1,4 @@
-public struct Color {
+public struct Color :Equatable {
     public var redComponent: Double
     public var greenComponent: Double
     public var blueComponent: Double
@@ -112,4 +112,17 @@ extension Color {
             throw Error.invalidColor(reason: "0x\(string) has invalid hex color string length")
         }
     }
+    
+    /// Checks if two Colors are the same by checking if they have the same r, g and b value
+    /// According to this definition, an invisible pixel is the same as a completely visible pixel.
+    ///
+    /// - Parameters:
+    ///     - lhs: The left hand side of the equation
+    ///     - rhs: The right hand side of the equation
+    /// - Returns:
+    ///     If both colors are equal
+    public static func == (lhs: Color, rhs: Color) -> Bool {
+        abs(lhs.redComponent - rhs.redComponent) < 0.0001 && abs(lhs.blueComponent - rhs.blueComponent) < 0.0001 && abs(lhs.greenComponent - rhs.greenComponent) < 0.0001
+    }
+    
 }
